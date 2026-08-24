@@ -874,13 +874,6 @@ class CaseFileApp(ctk.CTk):
             pady=(30, 10)
         )
 
-        cursor.execute(
-            "SELECT * FROM evidence WHERE id = %s",
-            (evidence_id,)
-        )
-
-        # evidence = cursor.fetchone()
-
         cursor.close()
         connection.close()
 
@@ -913,6 +906,19 @@ class CaseFileApp(ctk.CTk):
             fill="x",
             padx=40,
             pady=(0, 15)
+        )
+
+        details_title = ctk.CTkLabel(
+            info_frame,
+            text="EVIDENCE DETAILS",
+            font=("Arial", 13, "bold"),
+            text_color="#7FA9D8"
+        )
+
+        details_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(20, 15)
         )
 
         # Evidence type
