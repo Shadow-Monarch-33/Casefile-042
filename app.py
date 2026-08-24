@@ -134,7 +134,7 @@ class CaseFileApp(ctk.CTk):
         )
 
         # Main Area
-        self.main_frame = ctk.CTkFrame(
+        self.main_frame = ctk.CTkScrollableFrame(
             self,
             corner_radius=0,
             fg_color="#101827"
@@ -402,33 +402,525 @@ class CaseFileApp(ctk.CTk):
         connection.close()
 
         for suspect in suspects:
-            print(suspect)
+            card = ctk.CTkFrame(
+                self.main_frame,
+                fg_color="#162235",
+                corner_radius=12
+            )
+
+            card.pack(
+                fill="x",
+                padx=40,
+                pady=8
+            )
+
+            name_label = ctk.CTkLabel(
+                card,
+                text=suspect["name"],
+                font=("Arial", 20, "bold"),
+                text_color="#FFFFFF"
+            )
+
+            name_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(15, 2)
+            )
+
+            details_label = ctk.CTkLabel(
+                card,
+                text=f'{suspect["age"]} years old  •  {suspect["occupation"]}',
+                font=("Arial", 13),
+                text_color="#7D8DA6"
+            )
+
+            details_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 8)
+            )
+
+            status_label = ctk.CTkLabel(
+                card,
+                text=suspect["status"],
+                font=("Arial", 12, "bold"),
+                text_color="#7FA9D8"
+            )
+
+            status_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 15)
+            )
+
+            view_button = ctk.CTkButton(
+                card,
+                text="VIEW PROFILE  →",
+                font=("Arial", 12, "bold"),
+                width=140,
+                height=32,
+                fg_color="#1D4E89",
+                hover_color="#2863A8",
+                command=lambda suspect_id=suspect["id"]: self.show_suspect_details(suspect_id)
+            )
+
+            view_button.pack(
+                anchor="e",
+                padx=20,
+                pady=(0, 15)
+            )
+
+    def show_suspect_details(self, suspect_id):
+
+        for widget in self.main_frame.winfo_children():
+            widget.destroy()
+
+        back_button = ctk.CTkButton(
+            self.main_frame,
+            text="← BACK TO SUSPECTS",
+            font=("Arial", 12, "bold"),
+            width=170,
+            height=35,
+            fg_color="transparent",
+            border_width=1,
+            border_color="#2A3D57",
+            hover_color="#1C2C44",
+            command=lambda: self.show_page("suspects")
+        )
+
+        back_button.pack(
+            anchor="w",
+            padx=40,
+            pady=(30, 10)
+        )
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(
+            "SELECT * FROM suspects WHERE id = %s",
+            (suspect_id,)
+        )
+
+        suspect = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT
+                evidence.title,
+                evidence.description,
+                evidence.importance,
+                evidence_connections.connection_description
+            FROM evidence_connections
+            JOIN evidence
+                ON evidence_connections.evidence_id = evidence.id
+            WHERE evidence_connections.suspect_id = %s
+        """, (suspect_id,))
+
+        connected_evidence = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        title = ctk.CTkLabel(
+            self.main_frame,
+            text=suspect["name"],
+            font=("Arial", 32, "bold"),
+            text_color="#FFFFFF"
+        )
+
+        title.pack(
+            anchor="w",
+            padx=40,
+            pady=(40, 5)
+        )
+
+        details = ctk.CTkLabel(
+            self.main_frame,
+            text=f'{suspect["age"]} years old  •  {suspect["occupation"]}',
+            font=("Arial", 15),
+            text_color="#7D8DA6"
+        )
+
+        details.pack(
+            anchor="w",
+            padx=40,
+            pady=(0, 25)
+        )
+
+        # Information container
+        info_frame = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="#162235",
+            corner_radius=12
+        )
+
+        info_frame.pack(
+            fill="x",
+            padx=40,
+            pady=(0, 20)
+        )
+
+        # Motive
+        motive_title = ctk.CTkLabel(
+            info_frame,
+            text="MOTIVE",
+            font=("Arial", 13, "bold"),
+            text_color="#7FA9D8"
+        )
+
+        motive_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(20, 5)
+        )
+
+        motive_text = ctk.CTkLabel(
+            info_frame,
+            text=suspect["motive"],
+            font=("Arial", 14),
+            text_color="#D5DCE8",
+            justify="left",
+            wraplength=800
+        )
+
+        motive_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Alibi
+        alibi_title = ctk.CTkLabel(
+            info_frame,
+            text="ALIBI",
+            font=("Arial", 13, "bold"),
+            text_color="#7FA9D8"
+        )
+
+        alibi_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 5)
+        )
+
+        alibi_text = ctk.CTkLabel(
+            info_frame,
+            text=suspect["alibi"],
+            font=("Arial", 14),
+            text_color="#D5DCE8",
+            justify="left",
+            wraplength=800
+        )
+
+        alibi_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 20)
+        )
+
+        # Connected evidence section
+        evidence_title = ctk.CTkLabel(
+            self.main_frame,
+            text="CONNECTED EVIDENCE",
+            font=("Arial", 18, "bold"),
+            text_color="#FFFFFF"
+        )
+
+        evidence_title.pack(
+            anchor="w",
+            padx=40,
+            pady=(5, 10)
+        )
+
+        for evidence in connected_evidence:
+
+            evidence_card = ctk.CTkFrame(
+                self.main_frame,
+                fg_color="#162235",
+                corner_radius=12
+            )
+
+            evidence_card.pack(
+                fill="x",
+                padx=40,
+                pady=6
+            )
+
+            evidence_name = ctk.CTkLabel(
+                evidence_card,
+                text=evidence["title"],
+                font=("Arial", 16, "bold"),
+                text_color="#FFFFFF"
+            )
+
+            evidence_name.pack(
+                anchor="w",
+                padx=20,
+                pady=(15, 4)
+            )
+
+            connection_text = ctk.CTkLabel(
+                evidence_card,
+                text=evidence["connection_description"],
+                font=("Arial", 13),
+                text_color="#D5DCE8",
+                justify="left",
+                wraplength=800
+            )
+
+            connection_text.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 15)
+            )
 
     def create_evidence_page(self):
+
         title = ctk.CTkLabel(
             self.main_frame,
             text="Evidence",
-            font=("Arial", 32, "bold")
+            font=("Arial", 32, "bold"),
+            text_color="#FFFFFF"
         )
 
         title.pack(
             anchor="w",
             padx=40,
-            pady=40
+            pady=(40, 5)
         )
 
+        subtitle = ctk.CTkLabel(
+            self.main_frame,
+            text="Collected evidence connected to CASE #042",
+            font=("Arial", 14),
+            text_color="#7D8DA6"
+        )
+
+        subtitle.pack(
+            anchor="w",
+            padx=40,
+            pady=(0, 25)
+        )
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM evidence")
+
+        evidence_items = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        for evidence in evidence_items:
+
+            card = ctk.CTkFrame(
+                self.main_frame,
+                fg_color="#162235",
+                corner_radius=12
+            )
+
+            card.pack(
+                fill="x",
+                padx=40,
+                pady=8
+            )
+
+            title_label = ctk.CTkLabel(
+                card,
+                text=evidence["title"],
+                font=("Arial", 18, "bold"),
+                text_color="#FFFFFF"
+            )
+
+            title_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(15, 3)
+            )
+
+            details_label = ctk.CTkLabel(
+                card,
+                text=f'{evidence["evidence_type"]}  •  {evidence["location"]}',
+                font=("Arial", 13),
+                text_color="#7D8DA6"
+            )
+
+            details_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 8)
+            )
+
+            description_label = ctk.CTkLabel(
+                card,
+                text=evidence["description"],
+                font=("Arial", 13),
+                text_color="#D5DCE8",
+                justify="left",
+                wraplength=800
+            )
+
+            description_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 8)
+            )
+
+            importance_colors = {
+                "Low": "#6B7280",
+                "Medium": "#D4A72C",
+                "High": "#E67E22",
+                "Critical": "#E74C3C"
+            }
+
+            importance_color = importance_colors.get(
+                evidence["importance"],
+                "#7FA9D8"
+            )
+
+            importance_label = ctk.CTkLabel(
+                card,
+                text=evidence["importance"].upper(),
+                font=("Arial", 11, "bold"),
+                text_color=importance_color
+            )
+
+            importance_label.pack(
+                anchor="w",
+                padx=20,
+                pady=(0, 15)
+            )
+
     def create_timeline_page(self):
+
         title = ctk.CTkLabel(
             self.main_frame,
             text="Timeline",
-            font=("Arial", 32, "bold")
+            font=("Arial", 32, "bold"),
+            text_color="#FFFFFF"
         )
 
         title.pack(
             anchor="w",
             padx=40,
-            pady=40
+            pady=(40, 5)
         )
+
+        subtitle = ctk.CTkLabel(
+            self.main_frame,
+            text="Chronological reconstruction of events",
+            font=("Arial", 14),
+            text_color="#7D8DA6"
+        )
+
+        subtitle.pack(
+            anchor="w",
+            padx=40,
+            pady=(0, 25)
+        )
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT * FROM timeline
+            ORDER BY event_time
+        """)
+
+        events = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+
+        for event in events:
+
+            timeline_row = ctk.CTkFrame(
+                self.main_frame,
+                fg_color="transparent"
+            )
+
+            timeline_row.pack(
+                fill="x",
+                padx=40,
+                pady=3
+            )
+
+            dot = ctk.CTkLabel(
+                timeline_row,
+                text="●",
+                font=("Arial", 20),
+                text_color="#7FA9D8",
+                width=35
+            )
+
+            dot.pack(
+                side="left",
+                padx=(0, 10)
+            )
+
+            event_frame = ctk.CTkFrame(
+                timeline_row,
+                fg_color="#162235",
+                corner_radius=12
+            )
+
+            event_frame.pack(
+                side="left",
+                fill="x",
+                expand=True
+            )
+
+            time_label = ctk.CTkLabel(
+                event_frame,
+                text=str(event["event_time"]),
+                font=("Arial", 18, "bold"),
+                text_color="#7FA9D8",
+                width=100
+            )
+
+            time_label.pack(
+                side="left",
+                padx=(20, 15),
+                pady=20
+            )
+
+            details_frame = ctk.CTkFrame(
+                event_frame,
+                fg_color="transparent"
+            )
+
+            details_frame.pack(
+                side="left",
+                fill="both",
+                expand=True,
+                pady=15
+            )
+
+            event_label = ctk.CTkLabel(
+                details_frame,
+                text=event["event"],
+                font=("Arial", 14),
+                text_color="#FFFFFF",
+                justify="left",
+                wraplength=650
+            )
+
+            event_label.pack(
+                anchor="w"
+            )
+
+            location_label = ctk.CTkLabel(
+                details_frame,
+                text=event["location"],
+                font=("Arial", 12),
+                text_color="#7D8DA6"
+            )
+
+            location_label.pack(
+                anchor="w",
+                pady=(5, 0)
+            )
 
 if __name__ == "__main__":
     app = CaseFileApp()
