@@ -257,6 +257,30 @@ class CaseFileApp(ctk.CTk):
             pady=(0, 18)
         )
 
+        # Get statistics from database
+
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT COUNT(*) FROM suspects")
+        suspect_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM evidence")
+        evidence_count = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM timeline")
+        timeline_count = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM evidence
+            WHERE importance = 'Critical'
+        """)
+        critical_count = cursor.fetchone()[0]
+
+        cursor.close()
+        connection.close()
+
         # Statistics section
         stats_frame = ctk.CTkFrame(
             self.main_frame,
@@ -270,10 +294,10 @@ class CaseFileApp(ctk.CTk):
         )
 
         stats = [
-            ("4", "SUSPECTS"),
-            ("8", "EVIDENCE ITEMS"),
-            ("9", "TIMELINE EVENTS"),
-            ("2", "CRITICAL LEADS")
+            (str(suspect_count), "SUSPECTS"),
+            (str(evidence_count), "EVIDENCE ITEMS"),
+            (str(timeline_count), "TIMELINE EVENTS"),
+            (str(critical_count), "CRITICAL LEADS")
         ]
 
         for number, label in stats:
@@ -321,8 +345,7 @@ class CaseFileApp(ctk.CTk):
         )
 
         leads_frame.pack(
-            fill="both",
-            expand=True,
+            fill="x",
             padx=40,
             pady=(0, 30)
         )
@@ -709,15 +732,20 @@ class CaseFileApp(ctk.CTk):
 
         evidence_items = cursor.fetchall()
 
+        print("Evidence count:", len(evidence_items))
+
         cursor.close()
         connection.close()
 
         for evidence in evidence_items:
 
+            evidence_id = evidence["id"]
+
             card = ctk.CTkFrame(
                 self.main_frame,
                 fg_color="#162235",
-                corner_radius=12
+                corner_radius=12,
+                cursor="hand2"
             )
 
             card.pack(
@@ -774,16 +802,14 @@ class CaseFileApp(ctk.CTk):
                 "Critical": "#E74C3C"
             }
 
-            importance_color = importance_colors.get(
-                evidence["importance"],
-                "#7FA9D8"
-            )
-
             importance_label = ctk.CTkLabel(
                 card,
                 text=evidence["importance"].upper(),
                 font=("Arial", 11, "bold"),
-                text_color=importance_color
+                text_color=importance_colors.get(
+                    evidence["importance"],
+                    "#7FA9D8"
+                )
             )
 
             importance_label.pack(
@@ -791,6 +817,196 @@ class CaseFileApp(ctk.CTk):
                 padx=20,
                 pady=(0, 15)
             )
+
+            def open_evidence(event, evidence_id=evidence_id):
+                self.show_evidence_details(evidence_id)
+                return "break"
+
+
+            widgets = [
+                card,
+                title_label,
+                details_label,
+                description_label,
+                importance_label
+            ]
+
+            for widget in widgets:
+                widget.bind(
+                    "<Button-1>",
+                    open_evidence
+                )
+
+    def show_evidence_details(self, evidence_id):
+
+        # Clear current page
+        for widget in self.main_frame.winfo_children():
+            widget.destroy()
+
+        self.main_frame._parent_canvas.yview_moveto(0)
+
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute(
+            "SELECT * FROM evidence WHERE id = %s",
+            (evidence_id,)
+        )
+
+        evidence = cursor.fetchone()
+
+        # Back button FIRST
+        back_button = ctk.CTkButton(
+            self.main_frame,
+            text="← Back to Evidence",
+            width=160,
+            height=38,
+            fg_color="transparent",
+            hover_color="#162235",
+            text_color="#7FA9D8",
+            anchor="w",
+            command=lambda: self.show_page("evidence")
+        )
+
+        back_button.pack(
+            anchor="w",
+            padx=40,
+            pady=(30, 10)
+        )
+
+        cursor.execute(
+            "SELECT * FROM evidence WHERE id = %s",
+            (evidence_id,)
+        )
+
+        # evidence = cursor.fetchone()
+
+        cursor.close()
+        connection.close()
+
+        # Safety check
+        if evidence is None:
+            return
+
+        # Evidence title
+        title = ctk.CTkLabel(
+            self.main_frame,
+            text=evidence["title"],
+            font=("Arial", 32, "bold"),
+            text_color="#FFFFFF"
+        )
+
+        title.pack(
+            anchor="w",
+            padx=40,
+            pady=(5, 20)
+        )
+
+        # Information frame
+        info_frame = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="#162235",
+            corner_radius=12
+        )
+
+        info_frame.pack(
+            fill="x",
+            padx=40,
+            pady=(0, 15)
+        )
+
+        # Evidence type
+        type_label = ctk.CTkLabel(
+            info_frame,
+            text=f"Type: {evidence['evidence_type']}",
+            font=("Arial", 14),
+            text_color="#7D8DA6",
+            anchor="w"
+        )
+        type_label.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 5)
+        )
+
+        # Location
+        location_label = ctk.CTkLabel(
+            info_frame,
+            text=f"Location: {evidence['location']}",
+            font=("Arial", 14),
+            text_color="#7D8DA6",
+            anchor="w"
+        )
+        location_label.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 5)
+        )
+
+        # Importance
+        importance_colors = {
+            "Low": "#6B7280",
+            "Medium": "#D4A72C",
+            "High": "#E67E22",
+            "Critical": "#E74C3C"
+        }
+        importance_label = ctk.CTkLabel(
+            info_frame,
+            text=f"Importance: {evidence['importance'].upper()}",
+            font=("Arial", 14, "bold"),
+            text_color=importance_colors.get(
+                evidence['importance'],
+                "#7FA9D8"
+            ),
+            anchor="w"
+        )
+        importance_label.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
+
+        # Description frame
+        desc_frame = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="#162235",
+            corner_radius=12
+        )
+        desc_frame.pack(
+            fill="x",
+            padx=40,
+            pady=(0, 15)
+        )
+
+        # Description title
+        desc_title = ctk.CTkLabel(
+            desc_frame,
+            text="Description",
+            font=("Arial", 16, "bold"),
+            text_color="#FFFFFF",
+            anchor="w"
+        )
+        desc_title.pack(
+            anchor="w",
+            padx=20,
+            pady=(15, 10)
+        )
+
+        # Description text
+        desc_text = ctk.CTkLabel(
+            desc_frame,
+            text=evidence['description'],
+            font=("Arial", 14),
+            text_color="#D5DCE8",
+            justify="left",
+            wraplength=800,
+            anchor="w"
+        )
+        desc_text.pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 15)
+        )
 
     def create_timeline_page(self):
 
