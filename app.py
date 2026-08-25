@@ -8,6 +8,19 @@ class CaseFileApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        self.investigated_evidence = set()
+        self.discovered_leads = set()
+        self.valid_connections = {
+            frozenset({1, 4}): {
+                "id": "access_during_blackout",
+                "title": "ACCESS DURING BLACKOUT",
+                "description": (
+                    "The access card activity occurred while "
+                    "the executive floor security cameras were offline."
+                )
+            }
+        }
+
         self.title("CASEFILE")
         self.geometry("1200x750")
         self.minsize(1000, 650)
@@ -839,6 +852,8 @@ class CaseFileApp(ctk.CTk):
 
     def show_evidence_details(self, evidence_id):
 
+        self.investigated_evidence.add(evidence_id)
+
         # Clear current page
         for widget in self.main_frame.winfo_children():
             widget.destroy()
@@ -1013,6 +1028,292 @@ class CaseFileApp(ctk.CTk):
             padx=20,
             pady=(0, 15)
         )
+
+        # Connect Evidence button
+        connect_button = ctk.CTkButton(
+            self.main_frame,
+            text="CONNECT EVIDENCE",
+            width=180,
+            height=38,
+            fg_color="#1C2C44",
+            hover_color="#2A3D57",
+            text_color="#FFFFFF",
+            command=lambda: self.show_connection_modal(evidence_id)
+        )
+
+        connect_button.pack(
+            anchor="w",
+            padx=40,
+            pady=(10, 20)
+        )
+
+    def show_connection_modal(self, current_evidence_id):
+        # Get all evidence items
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM evidence")
+        all_evidence = cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+        # Create modal
+        modal = ctk.CTkFrame(
+            self,
+            width=500,
+            height=400,
+            fg_color="#101A2B",
+            corner_radius=15,
+            border_width=1,
+            border_color="#2A3D57"
+        )
+
+        modal.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        # Modal title
+        modal_title = ctk.CTkLabel(
+            modal,
+            text="CONNECT EVIDENCE",
+            font=("Arial", 18, "bold"),
+            text_color="#FFFFFF"
+        )
+        modal_title.pack(
+            pady=(25, 15)
+        )
+
+        # Instruction text
+        instruction = ctk.CTkLabel(
+            modal,
+            text="Select another piece of evidence to connect with:",
+            font=("Arial", 13),
+            text_color="#7D8DA6"
+        )
+        instruction.pack(
+            pady=(0, 15)
+        )
+
+        # Evidence selection frame
+        selection_frame = ctk.CTkFrame(
+            modal,
+            fg_color="#162235",
+            corner_radius=10
+        )
+        selection_frame.pack(
+            fill="both",
+            expand=True,
+            padx=30,
+            pady=(0, 15)
+        )
+
+        # Add evidence items (excluding current)
+        for evidence in all_evidence:
+            if evidence["id"] == current_evidence_id:
+                continue
+
+            evidence_button = ctk.CTkButton(
+                selection_frame,
+                text=evidence["title"],
+                font=("Arial", 13),
+                fg_color="transparent",
+                hover_color="#1C2C44",
+                text_color="#D5DCE8",
+                anchor="w",
+                height=35,
+                command=lambda e=evidence, ce=current_evidence_id, m=modal: self.check_connection(e["id"], ce, m)
+            )
+            evidence_button.pack(
+                fill="x",
+                padx=15,
+                pady=5
+            )
+
+        # Cancel button
+        cancel_button = ctk.CTkButton(
+            modal,
+            text="CANCEL",
+            width=120,
+            height=35,
+            fg_color="#1C2C44",
+            hover_color="#2A3D57",
+            text_color="#FFFFFF",
+            command=modal.destroy
+        )
+        cancel_button.pack(
+            pady=(0, 20)
+        )
+
+    def check_connection(self, selected_evidence_id, current_evidence_id, modal):
+        modal.destroy()
+
+        # Check if this is a valid connection
+        connection_key = frozenset({current_evidence_id, selected_evidence_id})
+        
+        if connection_key in self.valid_connections:
+            connection_data = self.valid_connections[connection_key]
+            
+            # Check if already discovered
+            if connection_data["id"] in self.discovered_leads:
+                self.show_already_discovered_modal(connection_data["title"])
+            else:
+                # Add to discovered leads
+                self.discovered_leads.add(connection_data["id"])
+                self.show_connection_discovered_modal(connection_data)
+        else:
+            # Invalid connection
+            self.show_invalid_connection_modal()
+
+    def show_connection_discovered_modal(self, connection_data):
+        modal = ctk.CTkFrame(
+            self,
+            width=450,
+            height=250,
+            fg_color="#101A2B",
+            corner_radius=15,
+            border_width=1,
+            border_color="#2A3D57"
+        )
+
+        modal.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        # Title
+        title = ctk.CTkLabel(
+            modal,
+            text="CONNECTION DISCOVERED",
+            font=("Arial", 20, "bold"),
+            text_color="#D4A72C"
+        )
+        title.pack(
+            pady=(30, 15)
+        )
+
+        # Lead title
+        lead_title = ctk.CTkLabel(
+            modal,
+            text=connection_data["title"],
+            font=("Arial", 16, "bold"),
+            text_color="#FFFFFF"
+        )
+        lead_title.pack(
+            pady=(0, 10)
+        )
+
+        # Description
+        description = ctk.CTkLabel(
+            modal,
+            text=connection_data["description"],
+            font=("Arial", 13),
+            text_color="#D5DCE8",
+            wraplength=380,
+            justify="center"
+        )
+        description.pack(
+            padx=30,
+            pady=(0, 20)
+        )
+
+        # Continue button
+        continue_button = ctk.CTkButton(
+            modal,
+            text="CONTINUE",
+            width=130,
+            height=38,
+            fg_color="#1C2C44",
+            hover_color="#2A3D57",
+            text_color="#FFFFFF",
+            command=modal.destroy
+        )
+        continue_button.pack()
+
+    def show_invalid_connection_modal(self):
+        modal = ctk.CTkFrame(
+            self,
+            width=400,
+            height=180,
+            fg_color="#101A2B",
+            corner_radius=15,
+            border_width=1,
+            border_color="#2A3D57"
+        )
+
+        modal.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        # Message
+        message = ctk.CTkLabel(
+            modal,
+            text="No meaningful connection can be established\nfrom these pieces of evidence.",
+            font=("Arial", 14),
+            text_color="#7D8DA6",
+            justify="center"
+        )
+        message.pack(
+            pady=(40, 20)
+        )
+
+        # Close button
+        close_button = ctk.CTkButton(
+            modal,
+            text="CLOSE",
+            width=100,
+            height=35,
+            fg_color="#1C2C44",
+            hover_color="#2A3D57",
+            text_color="#FFFFFF",
+            command=modal.destroy
+        )
+        close_button.pack()
+
+    def show_already_discovered_modal(self, connection_title):
+        modal = ctk.CTkFrame(
+            self,
+            width=400,
+            height=180,
+            fg_color="#101A2B",
+            corner_radius=15,
+            border_width=1,
+            border_color="#2A3D57"
+        )
+
+        modal.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        # Message
+        message = ctk.CTkLabel(
+            modal,
+            text=f"This connection has already been documented:\n{connection_title}",
+            font=("Arial", 14),
+            text_color="#7D8DA6",
+            justify="center"
+        )
+        message.pack(
+            pady=(40, 20)
+        )
+
+        # Close button
+        close_button = ctk.CTkButton(
+            modal,
+            text="CLOSE",
+            width=100,
+            height=35,
+            fg_color="#1C2C44",
+            hover_color="#2A3D57",
+            text_color="#FFFFFF",
+            command=modal.destroy
+        )
+        close_button.pack()
 
     def create_timeline_page(self):
 
