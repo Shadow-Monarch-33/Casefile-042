@@ -918,7 +918,7 @@ class CaseFileApp(ctk.CTk):
         details_title.pack(
             anchor="w",
             padx=20,
-            pady=(20, 15)
+            pady=(18, 12)
         )
 
         # Evidence type
@@ -926,13 +926,13 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=f"Type: {evidence['evidence_type']}",
             font=("Arial", 14),
-            text_color="#7D8DA6",
+            text_color="#D5DCE8",
             anchor="w"
         )
         type_label.pack(
             anchor="w",
             padx=20,
-            pady=(15, 5)
+            pady=(0, 8)
         )
 
         # Location
@@ -940,13 +940,13 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=f"Location: {evidence['location']}",
             font=("Arial", 14),
-            text_color="#7D8DA6",
+            text_color="#D5DCE8",
             anchor="w"
         )
         location_label.pack(
             anchor="w",
             padx=20,
-            pady=(0, 5)
+            pady=(0, 8)
         )
 
         # Importance
@@ -969,7 +969,7 @@ class CaseFileApp(ctk.CTk):
         importance_label.pack(
             anchor="w",
             padx=20,
-            pady=(0, 15)
+            pady=(0, 18)
         )
 
         # Description frame
@@ -987,15 +987,15 @@ class CaseFileApp(ctk.CTk):
         # Description title
         desc_title = ctk.CTkLabel(
             desc_frame,
-            text="Description",
-            font=("Arial", 16, "bold"),
-            text_color="#FFFFFF",
+            text="DESCRIPTION",
+            font=("Arial", 13, "bold"),
+            text_color="#7FA9D8",
             anchor="w"
         )
         desc_title.pack(
             anchor="w",
             padx=20,
-            pady=(15, 10)
+            pady=(18, 12)
         )
 
         # Description text
