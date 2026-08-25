@@ -17,7 +17,8 @@ class CaseFileApp(ctk.CTk):
                 "description": (
                     "The access card activity occurred while "
                     "the executive floor security cameras were offline."
-                )
+                ),
+                "evidence_ids": {1, 4}
             }
         }
 
@@ -146,6 +147,25 @@ class CaseFileApp(ctk.CTk):
             pady=8
         )
 
+
+        self.deduction_board_button = ctk.CTkButton(
+            self.sidebar,
+            text="◉  Deduction Board",
+            font=("Arial", 15),
+            anchor="w",
+            height=45,
+            corner_radius=8,
+            fg_color="transparent",
+            hover_color="#16345C",
+            command=lambda: self.show_page("deduction board")
+        )
+
+        self.deduction_board_button.pack(
+            fill="x",
+            padx=15,
+            pady=8
+        )
+
         # Main Area
         self.main_frame = ctk.CTkScrollableFrame(
             self,
@@ -174,6 +194,9 @@ class CaseFileApp(ctk.CTk):
 
         elif page_name == "timeline":
             self.create_timeline_page()
+
+        elif page_name == "deduction board":
+            self.create_deduction_board_page()
 
     def create_overview_page(self):
         # Page header
@@ -1314,6 +1337,214 @@ class CaseFileApp(ctk.CTk):
             command=modal.destroy
         )
         close_button.pack()
+
+    def create_deduction_board_page(self):
+
+        title = ctk.CTkLabel(
+            self.main_frame,
+            text="Deduction Board",
+            font=("Arial", 32, "bold"),
+            text_color="#FFFFFF"
+        )
+
+        title.pack(
+            anchor="w",
+            padx=40,
+            pady=(40, 5)
+        )
+
+        subtitle = ctk.CTkLabel(
+            self.main_frame,
+            text="Document connections and deductions discovered from evidence analysis",
+            font=("Arial", 14),
+            text_color="#7D8DA6"
+        )
+
+        subtitle.pack(
+            anchor="w",
+            padx=40,
+            pady=(0, 25)
+        )
+
+        # Check if there are discovered leads
+        if not self.discovered_leads:
+            # Show empty state
+            empty_state_frame = ctk.CTkFrame(
+                self.main_frame,
+                fg_color="#162235",
+                corner_radius=12
+            )
+
+            empty_state_frame.pack(
+                fill="x",
+                padx=40,
+                pady=(0, 15)
+            )
+
+            # Empty state icon/text
+            empty_title = ctk.CTkLabel(
+                empty_state_frame,
+                text="No deductions discovered",
+                font=("Arial", 18, "bold"),
+                text_color="#7D8DA6"
+            )
+
+            empty_title.pack(
+                pady=(40, 10)
+            )
+
+            empty_description = ctk.CTkLabel(
+                empty_state_frame,
+                text="Examine the evidence and connect related clues to uncover hidden relationships.",
+                font=("Arial", 14),
+                text_color="#8B9BB4",
+                wraplength=800,
+                justify="center"
+            )
+
+            empty_description.pack(
+                padx=40,
+                pady=(0, 40)
+            )
+        else:
+            # Get evidence data for display
+            connection = get_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM evidence")
+            evidence_data = {e["id"]: e for e in cursor.fetchall()}
+            cursor.close()
+            connection.close()
+
+            # Display discovered deductions
+            for connection_key, connection_data in self.valid_connections.items():
+                if connection_data["id"] in self.discovered_leads:
+                    # Get evidence IDs from the connection
+                    evidence_ids = list(connection_data["evidence_ids"])
+                    
+                    # Get evidence names
+                    evidence_names = []
+                    for eid in evidence_ids:
+                        if eid in evidence_data:
+                            evidence_names.append(evidence_data[eid]["title"])
+                    
+                    # Create deduction card
+                    deduction_card = ctk.CTkFrame(
+                        self.main_frame,
+                        fg_color="#162235",
+                        corner_radius=12
+                    )
+
+                    deduction_card.pack(
+                        fill="x",
+                        padx=40,
+                        pady=(0, 15)
+                    )
+
+                    # Deduction header
+                    deduction_header = ctk.CTkLabel(
+                        deduction_card,
+                        text="DEDUCTION",
+                        font=("Arial", 13, "bold"),
+                        text_color="#7FA9D8"
+                    )
+
+                    deduction_header.pack(
+                        anchor="w",
+                        padx=20,
+                        pady=(18, 12)
+                    )
+
+                    # Evidence connection display
+                    if len(evidence_names) >= 2:
+                        evidence_frame = ctk.CTkFrame(
+                            deduction_card,
+                            fg_color="transparent"
+                        )
+
+                        evidence_frame.pack(
+                            fill="x",
+                            padx=20,
+                            pady=(0, 12)
+                        )
+
+                        # First evidence
+                        evidence1_label = ctk.CTkLabel(
+                            evidence_frame,
+                            text=evidence_names[0],
+                            font=("Arial", 14, "bold"),
+                            text_color="#FFFFFF"
+                        )
+                        evidence1_label.pack(
+                            anchor="w",
+                            pady=(0, 5)
+                        )
+
+                        # Plus sign
+                        plus_label = ctk.CTkLabel(
+                            evidence_frame,
+                            text="+",
+                            font=("Arial", 16, "bold"),
+                            text_color="#7FA9D8"
+                        )
+                        plus_label.pack(
+                            anchor="w",
+                            pady=(0, 5)
+                        )
+
+                        # Second evidence
+                        evidence2_label = ctk.CTkLabel(
+                            evidence_frame,
+                            text=evidence_names[1],
+                            font=("Arial", 14, "bold"),
+                            text_color="#FFFFFF"
+                        )
+                        evidence2_label.pack(
+                            anchor="w",
+                            pady=(0, 5)
+                        )
+
+                        # Arrow
+                        arrow_label = ctk.CTkLabel(
+                            evidence_frame,
+                            text="↓",
+                            font=("Arial", 16, "bold"),
+                            text_color="#7FA9D8"
+                        )
+                        arrow_label.pack(
+                            anchor="w",
+                            pady=(0, 5)
+                        )
+
+                    # Deduction title
+                    result_title = ctk.CTkLabel(
+                        deduction_card,
+                        text=connection_data["title"],
+                        font=("Arial", 16, "bold"),
+                        text_color="#D4A72C"
+                    )
+
+                    result_title.pack(
+                        anchor="w",
+                        padx=20,
+                        pady=(0, 10)
+                    )
+
+                    # Deduction description
+                    result_description = ctk.CTkLabel(
+                        deduction_card,
+                        text=connection_data["description"],
+                        font=("Arial", 14),
+                        text_color="#D5DCE8",
+                        justify="left",
+                        wraplength=800,
+                        anchor="w"
+                    )
+
+                    result_description.pack(
+                        anchor="w",
+                        padx=20,
+                        pady=(0, 18)
+                    )
 
     def create_timeline_page(self):
 
