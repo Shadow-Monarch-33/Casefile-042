@@ -1,4 +1,4 @@
-# CASEFILE
+# CASEFILE #42
 
 An interactive desktop detective game built with **Python, CustomTkinter, and MySQL**.
 
