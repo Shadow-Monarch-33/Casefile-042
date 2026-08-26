@@ -533,131 +533,216 @@ class CaseFileApp(ctk.CTk):
             pady=(12, 20)
         )
 
-        # What we know
-        known_title = ctk.CTkLabel(
-            briefing,
-            text="",
-            font=("Arial", 12, "bold"),
-            text_color="#9CCBFF"
-        )
+        # Briefing Content
 
-        known_title.pack(
-            pady=(5, 8)
-        )
+        briefing_pages = [
+            {
+                "heading": "THE INCIDENT",
+                "heading_color": "#D4A72C",
+                "text": (
+                    "At approximately 11:05 PM, a member of staff was found dead "
+                    "inside an office on the executive floor.\n\n"
 
-        known_text = ctk.CTkLabel(
-            briefing,
-            text="",
-            font=("Arial", 13),
-            text_color="#B9C5D6",
-            justify="left",
-            wraplength=600
-        )
+                    "The circumstances surrounding the death are unclear.\n\n"
 
-        known_text.pack(
-            padx=60
-        )
+                    "The events leading up to the discovery have not yet been fully "
+                    "reconstructed, and the available evidence does not provide a "
+                    "complete explanation on its own.\n\n"
+
+                    "Your investigation begins with one question:\n\n"
+
+                    "What happened before 11:05 PM?"
+                )
+            },
+            {
+                "heading": "THE CRITICAL WINDOW",
+                "heading_color": "#9CCBFF",
+                "text": (
+                    "Investigators have identified the period between 10:00 PM and "
+                    "11:05 PM as the most important unresolved period of the case.\n\n"
+
+                    "What happened during this window is not yet known.\n\n"
+
+                    "The available records may contain fragments of the truth, but "
+                    "they have not yet been assembled into a reliable sequence of "
+                    "events.\n\n"
+
+                    "Your task is to determine how the events of that night connect "
+                    "and reconstruct what happened during the missing period."
+                )
+            },
+            {
+                "heading": "THE PEOPLE INVOLVED",
+                "heading_color": "#9CCBFF",
+                "text": (
+                    "Four individuals are currently connected to the investigation.\n\n"
+
+                    "Each may possess information relevant to the events of that "
+                    "night.\n\n"
+
+                    "Their statements should not automatically be accepted as fact.\n\n"
+
+                    "As new evidence is discovered, you may uncover inconsistencies "
+                    "between what a suspect claims and what the records actually show.\n\n"
+
+                    "Question them carefully. What someone says may be important — "
+                    "but so may what they cannot explain."
+                )
+            },
+            {
+                "heading": "INITIAL CASE MATERIAL",
+                "heading_color": "#9CCBFF",
+                "text": (
+                    "Your investigation begins with access to the evidence collected "
+                    "from the case.\n\n"
+
+                    "Examine each piece carefully.\n\n"
+
+                    "A single record may appear insignificant when viewed alone, but "
+                    "its meaning can change when compared with another piece of "
+                    "information.\n\n"
+
+                    "Pay close attention to timing, locations, actions, and any details "
+                    "that appear to contradict another account.\n\n"
+
+                    "The answers may not be contained in one piece of evidence."
+                )
+            },
+            {
+                "heading": "HOW TO INVESTIGATE",
+                "heading_color": "#9CCBFF",
+                "text": (
+                    "Examine the available evidence and look for meaningful "
+                    "relationships between different records.\n\n"
+
+                    "When two pieces of evidence appear connected, analyze their "
+                    "relationship to uncover new findings.\n\n"
+
+                    "New discoveries may reveal additional information, update the "
+                    "timeline, or provide new directions for questioning a suspect.\n\n"
+
+                    "Build your understanding of the case gradually.\n\n"
+
+                    "Do not guess. Follow what the evidence can actually support."
+                )
+            },
+            {
+                "heading": "YOUR OBJECTIVE",
+                "heading_color": "#D4A72C",
+                "text": (
+                    "Examine the evidence.\n\n"
+
+                    "Identify meaningful connections.\n\n"
+
+                    "Reconstruct the events of the critical window.\n\n"
+
+                    "Question the individuals connected to the investigation.\n\n"
+
+                    "Challenge statements that conflict with the evidence.\n\n"
+
+                    "Build the case one discovery at a time.\n\n"
+
+                    "The truth is already somewhere in the case file.\n\n"
+
+                    "Your job is to find it."
+                )
+            }
+        ]
+
+        # Reuse the existing labels
+
+        current_page = 0
+
+
+        def show_briefing_page():
+
+            page = briefing_pages[current_page]
+
+            # Reset text
+            briefing_label.configure(
+                text=page["heading"],
+                text_color=page["heading_color"]
+            )
+
+            briefing_text.configure(
+                text=""
+            )
+
+            next_button.pack_forget()
+
+            # Type page text
+            def type_text(index=0):
+
+                if index < len(page["text"]):
+
+                    briefing_text.configure(
+                        text=page["text"][:index + 1]
+                    )
+
+                    briefing.after(
+                        20,
+                        lambda: type_text(index + 1)
+                    )
+
+                else:
+
+                    briefing.after(
+                        400,
+                        show_next_button
+                    )
+
+            type_text()
+
+
+        def show_next_button():
+
+            # Last page → Begin Investigation
+            if current_page == len(briefing_pages) - 1:
+
+                next_button.configure(
+                    text="BEGIN INVESTIGATION  →",
+                    command=overlay.destroy
+                )
+
+            # Normal page → Next
+            else:
+
+                next_button.configure(
+                    text="NEXT  →",
+                    command=next_page
+                )
+
+            next_button.pack(
+                pady=(30, 30)
+            )
+
+
+        def next_page():
+
+            nonlocal current_page
+
+            current_page += 1
+
+            show_briefing_page()
+
 
         # Button
-        begin_button = ctk.CTkButton(
+
+        next_button = ctk.CTkButton(
             briefing,
-            text="BEGIN INVESTIGATION  →",
+            text="",
             width=240,
             height=44,
             font=("Arial", 14, "bold"),
             fg_color="#1C4F82",
             hover_color="#2868A5",
-            text_color="#FFFFFF",
-            command=overlay.destroy
-        )
-
-        full_briefing = (
-            "A critical incident occurred within the company's "
-            "executive and security infrastructure.\n\n"
-            "Several records from the night contain inconsistencies, "
-            "and the available evidence does not yet provide a complete "
-            "account of what happened.\n\n"
-            "Four individuals connected to the incident are currently "
-            "under investigation."
-        )
-
-        full_known = (
-            "• Activity occurred during a critical security window.\n"
-            "• Multiple records and systems contain relevant information.\n"
-            "• Several individuals may have had access or knowledge.\n"
-            "• The available accounts do not yet form a complete timeline."
+            text_color="#FFFFFF"
         )
 
 
-        def type_known_title(index=0):
+        # Start first page
 
-            title = "WHAT WE KNOW"
-
-            if index < len(title):
-
-                known_title.configure(
-                    text=title[:index + 1]
-                )
-
-                briefing.after(
-                    35,
-                    lambda: type_known_title(index + 1)
-                )
-
-            else:
-
-                briefing.after(
-                    150,
-                    type_known
-                )
-
-
-        def type_known(index=0):
-
-            if index < len(full_known):
-
-                known_text.configure(
-                    text=full_known[:index + 1]
-                )
-
-                briefing.after(
-                    25,
-                    lambda: type_known(index + 1)
-                )
-
-            else:
-
-                briefing.after(
-                    300,
-                    lambda: begin_button.pack(
-                        pady=(25, 30)
-                    )
-                )
-
-
-        def type_briefing(index=0):
-
-            if index < len(full_briefing):
-
-                briefing_text.configure(
-                    text=full_briefing[:index + 1]
-                )
-
-                briefing.after(
-                    25,
-                    lambda: type_briefing(index + 1)
-                )
-
-            else:
-
-                # Briefing finished
-                briefing.after(
-                    400,
-                    type_known_title
-                )
-
-
-        type_briefing()
+        show_briefing_page()
 
     def build_sidebar_navigation(self):
         nav_items = [
