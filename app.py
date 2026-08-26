@@ -86,8 +86,12 @@ class CaseFileApp(ctk.CTk):
         super().__init__()
 
         self.current_page = "case overview"
+
         self.investigated_evidence = set()
         self.discovered_leads = set()
+        self.hints_used = 0
+        self.max_hints = 2
+
         self.discovery_history = []
         self.asked_questions = {}
         self.active_reaction = None
@@ -557,7 +561,7 @@ class CaseFileApp(ctk.CTk):
                 },
                 "method": "Used security administrator credentials to disable cameras, then used Elena's access card to access executive floor",
                 "motive": "Her lipstick and security logs would expose her presence and system manipulation",
-                "supporting_evidence_ids": [4, 7, 8],  # Security camera gap, Security console login, Coffee cup
+                "supporting_evidence_ids": [4, 7, 8, 9],  # Security camera gap, Security console login, Coffee cup
                 "required_evidence_count": 3,
                 "required_timeline_events": [
                     "executive_blackout",
@@ -1048,6 +1052,330 @@ class CaseFileApp(ctk.CTk):
             padx=15,
             pady=(0, 15)
         )
+
+        # Hint Button
+        self.hint_button = ctk.CTkButton(
+            self.sidebar,
+            text="💡  HINTS  (2)",
+            font=("Arial", 13, "bold"),
+            anchor="w",
+            height=42,
+            corner_radius=8,
+            fg_color="transparent",
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["text"],
+            command=self.show_hint
+        )
+
+        self.hint_button.pack(
+            fill="x",
+            padx=15,
+            pady=(0, 20)
+        )
+
+    def get_contextual_hint(self):
+
+        evidence_count = len(self.investigated_evidence)
+        leads = self.discovered_leads
+
+
+        # ─────────────────────────────────────
+        # Very Early Game
+        # ─────────────────────────────────────
+
+        if evidence_count == 0:
+            return (
+                "Every investigation starts with the evidence. Begin by examining "
+                "the records and objects connected to the night of the incident."
+            )
+
+        if evidence_count < 3:
+            return (
+                "Several important events occurred within a narrow time window. "
+                "Pay close attention to what happened between 10:10 PM and 10:28 PM."
+            )
+
+
+        # ─────────────────────────────────────
+        # Blackout / Security Access
+        # ─────────────────────────────────────
+
+        if "security_override_access" not in leads:
+            return (
+                "The CCTV blackout was manually triggered. Compare the camera "
+                "records with evidence that explains how the security system "
+                "was accessed."
+            )
+
+        if "sophie_security_workstation" not in leads:
+            return (
+                "Knowing that a security administrator account was used is only "
+                "part of the story. Try to determine where that session originated."
+            )
+
+
+        # ─────────────────────────────────────
+        # Elena / Access Card
+        # ─────────────────────────────────────
+
+        if "access_during_blackout" not in leads:
+            return (
+                "Elena's access card was used at 10:12 PM. The timing may be more "
+                "important than the identity printed on the card."
+            )
+
+
+        # ─────────────────────────────────────
+        # Marcus
+        # ─────────────────────────────────────
+
+        if evidence_count < 6:
+            return (
+                "An alibi is only useful if it covers the right period of time. "
+                "Look closely at when Marcus's meeting actually ended."
+            )
+
+
+        # ─────────────────────────────────────
+        # Noah
+        # ─────────────────────────────────────
+
+        if evidence_count < 8:
+            return (
+                "Being suspicious is not the same as having the opportunity to "
+                "commit the crime. Compare Noah's confirmed location with the "
+                "estimated time of the struggle."
+            )
+
+
+        # ─────────────────────────────────────
+        # Sophie's connection to the office
+        # ─────────────────────────────────────
+
+        if "office_presence" not in leads:
+            return (
+                "Someone's presence near the victim does not automatically prove "
+                "guilt. But it can become important when combined with other "
+                "events from the same time period."
+            )
+
+
+        # ─────────────────────────────────────
+        # Player has many clues but is stuck
+        # ─────────────────────────────────────
+
+        if len(leads) < 4:
+            return (
+                "Try connecting evidence that appears to describe different parts "
+                "of the same event. Time, location, and access are often more "
+                "useful together than separately."
+            )
+
+        if len(leads) < 6:
+            return (
+                "Not every suspicious person is equally important. Ask yourself "
+                "which suspect is connected to the greatest number of critical "
+                "events surrounding the estimated time of the murder."
+            )
+
+
+        # ─────────────────────────────────────
+        # Late game
+        # ─────────────────────────────────────
+
+        if len(leads) < 8:
+            return (
+                "The strongest theory should not merely identify someone with a "
+                "motive. It should also explain how that person had the opportunity "
+                "to act without being observed."
+            )
+
+
+        # ─────────────────────────────────────
+        # Final fallback
+        # ─────────────────────────────────────
+
+        return (
+            "Look for one explanation that connects the blackout, the executive "
+            "floor activity, the estimated time of the struggle, and the "
+            "contradictions in the suspects' accounts."
+        )
+
+    def show_hint(self):
+
+        # No hints remaining
+        if self.hints_used >= self.max_hints:
+
+            dialog = ctk.CTkToplevel(self)
+
+            dialog.title("Hints")
+
+            dialog.geometry("420x230")
+
+            dialog.configure(
+                fg_color=self.theme["background"]
+            )
+
+            dialog.transient(self)
+
+            dialog.grab_set()
+
+            title = ctk.CTkLabel(
+                dialog,
+                text="NO HINTS REMAINING",
+                font=("Arial", 18, "bold"),
+                text_color=self.theme["accent"]
+            )
+
+            title.pack(
+                pady=(35, 10)
+            )
+
+            message = ctk.CTkLabel(
+                dialog,
+                text=(
+                    "You have used both available hints.\n\n"
+                    "The remaining connections are yours to uncover."
+                ),
+                font=("Arial", 13),
+                text_color=self.theme["text"],
+                justify="center",
+                wraplength=330
+            )
+
+            message.pack(
+                padx=30,
+                pady=(0, 20)
+            )
+
+            close_button = ctk.CTkButton(
+                dialog,
+                text="RETURN TO CASE",
+                width=180,
+                height=38,
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                text_color=self.theme["heading"],
+                command=dialog.destroy
+            )
+
+            close_button.pack()
+
+            return
+
+
+        # Get the best hint for current progress
+        hint = self.get_contextual_hint()
+
+        # Consume a hint
+        self.hints_used += 1
+
+        remaining = self.max_hints - self.hints_used
+
+
+        # Hint window
+        dialog = ctk.CTkToplevel(self)
+
+        dialog.title("Investigation Hint")
+
+        dialog.geometry("520x320")
+
+        dialog.configure(
+            fg_color=self.theme["background"]
+        )
+
+        dialog.transient(self)
+
+        dialog.grab_set()
+
+
+        title = ctk.CTkLabel(
+            dialog,
+            text=f"💡 INVESTIGATION HINT  {self.hints_used}/2",
+            font=("Arial", 18, "bold"),
+            text_color=self.theme["accent"]
+        )
+
+        title.pack(
+            pady=(35, 15)
+        )
+
+
+        divider = ctk.CTkFrame(
+            dialog,
+            height=1,
+            fg_color=self.theme["border"]
+        )
+
+        divider.pack(
+            fill="x",
+            padx=40,
+            pady=(0, 20)
+        )
+
+
+        hint_label = ctk.CTkLabel(
+            dialog,
+            text=hint,
+            font=("Arial", 14),
+            text_color=self.theme["text"],
+            justify="center",
+            wraplength=420
+        )
+
+        hint_label.pack(
+            padx=40,
+            pady=(0, 20)
+        )
+
+
+        remaining_label = ctk.CTkLabel(
+            dialog,
+            text=(
+                f"{remaining} HINT REMAINING"
+                if remaining == 1
+                else f"{remaining} HINTS REMAINING"
+            ),
+            font=("Arial", 11, "bold"),
+            text_color=self.theme["muted"]
+        )
+
+        remaining_label.pack(
+            pady=(0, 15)
+        )
+
+
+        close_button = ctk.CTkButton(
+            dialog,
+            text="CONTINUE INVESTIGATION",
+            width=210,
+            height=38,
+            font=("Arial", 12, "bold"),
+            fg_color=self.theme["primary"],
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["heading"],
+            command=dialog.destroy
+        )
+
+        close_button.pack(
+            pady=(0, 25)
+        )
+
+
+        # Update the sidebar hint button
+        if remaining > 0:
+
+            self.hint_button.configure(
+                text=f"💡  HINTS  ({remaining})"
+            )
+
+        else:
+
+            self.hint_button.configure(
+                text="💡  HINTS USED",
+                state="disabled",
+                text_color=self.theme["muted"]
+            )
 
     def update_nav_state(self):
 
@@ -5199,28 +5527,21 @@ class CaseFileApp(ctk.CTk):
             padx=20,
             pady=(18, 12)
         )
+        
+        # Get all available evidence for the final case theory
 
-        # Get investigated evidence
-        investigated_ids = list(self.investigated_evidence)
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
 
-        available_evidence = []
+        cursor.execute("""
+            SELECT * FROM evidence
+            ORDER BY id
+        """)
 
-        if investigated_ids:
+        available_evidence = cursor.fetchall()
 
-            connection = get_connection()
-            cursor = connection.cursor(dictionary=True)
-
-            placeholders = ",".join(["%s"] * len(investigated_ids))
-
-            cursor.execute(
-                f"SELECT * FROM evidence WHERE id IN ({placeholders})",
-                investigated_ids
-            )
-
-            available_evidence = cursor.fetchall()
-
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection.close()
 
         self.evidence_checkboxes = {}
         for evidence in available_evidence:
