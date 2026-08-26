@@ -5190,6 +5190,8 @@ class CaseFileApp(ctk.CTk):
         else:
             self.show_resolution_interface()
 
+        # self.show_resolution_interface()
+
     def show_resolution_locked(self):
         """Show locked state when resolution not yet available"""
         locked_frame = ctk.CTkFrame(
@@ -5290,146 +5292,246 @@ class CaseFileApp(ctk.CTk):
         )
 
     def show_resolution_interface(self):
-        """Show the interactive case resolution interface"""
-        # Get suspect information
+        """Show the interactive case resolution interface."""
+
+        # GET SUSPECTS
+
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM suspects")
+
+        cursor.execute("""
+            SELECT *
+            FROM suspects
+            ORDER BY id
+        """)
+
         suspects = cursor.fetchall()
+
         cursor.close()
         connection.close()
 
-        # Build theory sections
-        self.current_theory = {
-            "suspect_id": None,
-            "timeline_choice": None,
-            "method_choice": None,
-            "motive_choice": None,
-            "evidence_ids": set()
-        }
+        # MAIN GRID
 
-        # WHO section
-        who_frame = ctk.CTkFrame(
+        theory_grid = ctk.CTkFrame(
             self.main_frame,
-            fg_color=self.theme["card"],
-            corner_radius=12
+            fg_color="transparent"
         )
-        who_frame.pack(
+
+        theory_grid.pack(
             fill="x",
             padx=40,
             pady=(0, 15)
         )
 
-        who_title = ctk.CTkLabel(
-            who_frame,
-            text="WHO",
-            font=("Arial", 13, "bold"),
-            text_color=self.theme["accent"]
-        )
-        who_title.pack(
-            anchor="w",
-            padx=20,
-            pady=(18, 12)
+        theory_grid.grid_columnconfigure(0, weight=1)
+        theory_grid.grid_columnconfigure(1, weight=1)
+
+        # 01 — WHO
+
+        who_frame = ctk.CTkFrame(
+            theory_grid,
+            fg_color=self.theme["card"],
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
         )
 
-        suspect_buttons_frame = ctk.CTkFrame(
+        who_frame.grid(
+            row=0,
+            column=0,
+            sticky="nsew",
+            padx=(0, 8),
+            pady=(0, 8)
+        )
+
+        ctk.CTkLabel(
+            who_frame,
+            text="01  WHO DID IT?",
+            font=("Arial", 13, "bold"),
+            text_color=self.theme["accent"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(18, 4)
+        )
+
+        ctk.CTkLabel(
+            who_frame,
+            text="Select who you believe is responsible.",
+            font=("Arial", 11),
+            text_color=self.theme["muted"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 12)
+        )
+
+
+        suspect_grid = ctk.CTkFrame(
             who_frame,
             fg_color="transparent"
         )
-        suspect_buttons_frame.pack(
+
+        suspect_grid.pack(
             fill="x",
-            padx=20,
+            padx=15,
             pady=(0, 15)
         )
+
+        suspect_grid.grid_columnconfigure(0, weight=1)
+        suspect_grid.grid_columnconfigure(1, weight=1)
 
         self.suspect_selection_buttons = {}
-        for suspect in suspects:
-            btn = ctk.CTkButton(
-                suspect_buttons_frame,
+
+        for index, suspect in enumerate(suspects):
+
+            row = index // 2
+            column = index % 2
+
+            button = ctk.CTkButton(
+                suspect_grid,
                 text=suspect["name"],
-                font=("Arial", 13),
+                font=("Arial", 12, "bold"),
+                height=42,
                 fg_color="transparent",
-                hover_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                border_width=1,
+                border_color=self.theme["border"],
                 text_color=self.theme["text"],
-                anchor="w",
-                height=40,
-                command=lambda s=suspect["id"]: self.select_resolution_suspect(s)
+                command=lambda suspect_id=suspect["id"]:
+                    self.select_resolution_suspect(suspect_id)
             )
-            btn.pack(
-                fill="x",
+
+            button.grid(
+                row=row,
+                column=column,
+                sticky="ew",
+                padx=4,
                 pady=4
             )
-            self.suspect_selection_buttons[suspect["id"]] = btn
 
-        # TIMELINE section
+            self.suspect_selection_buttons[
+                suspect["id"]
+            ] = button
+
+        # 02 — WHEN
+
         timeline_frame = ctk.CTkFrame(
-            self.main_frame,
+            theory_grid,
             fg_color=self.theme["card"],
-            corner_radius=12
-        )
-        timeline_frame.pack(
-            fill="x",
-            padx=40,
-            pady=(0, 15)
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
         )
 
-        timeline_title = ctk.CTkLabel(
+        timeline_frame.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+            padx=(8, 0),
+            pady=(0, 8)
+        )
+
+        ctk.CTkLabel(
             timeline_frame,
-            text="WHEN",
+            text="02  WHEN?",
             font=("Arial", 13, "bold"),
             text_color=self.theme["accent"]
-        )
-        timeline_title.pack(
+        ).pack(
             anchor="w",
             padx=20,
-            pady=(18, 12)
+            pady=(18, 4)
+        )
+
+        ctk.CTkLabel(
+            timeline_frame,
+            text="Identify when the critical events occurred.",
+            font=("Arial", 11),
+            text_color=self.theme["muted"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 10)
+        )
+
+        self.timeline_selection_var = ctk.StringVar(
+            value=""
         )
 
         timeline_options = [
-            "The murder occurred during the 10:10-10:28 PM security blackout",
-            "The murder occurred after cameras resumed recording",
-            "The murder occurred before the security blackout"
+            "During the 10:10–10:28 PM security blackout",
+            "After the cameras resumed recording",
+            "Before the security blackout"
         ]
 
-        self.timeline_selection_var = ctk.StringVar(value="")
-
         for option in timeline_options:
+
             radio = ctk.CTkRadioButton(
                 timeline_frame,
                 text=option,
+                variable=self.timeline_selection_var,
+                value=option,
                 font=("Arial", 12),
                 text_color=self.theme["text"],
-                variable=self.timeline_selection_var,
-                value=option
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                border_color=self.theme["border"]
             )
+
             radio.pack(
                 anchor="w",
                 padx=20,
-                pady=4
+                pady=6
             )
 
-        # METHOD section
+        ctk.CTkFrame(
+            timeline_frame,
+            height=10,
+            fg_color="transparent"
+        ).pack()
+
+        # 03 — HOW
+
         method_frame = ctk.CTkFrame(
-            self.main_frame,
+            theory_grid,
             fg_color=self.theme["card"],
-            corner_radius=12
-        )
-        method_frame.pack(
-            fill="x",
-            padx=40,
-            pady=(0, 15)
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
         )
 
-        method_title = ctk.CTkLabel(
+        method_frame.grid(
+            row=1,
+            column=0,
+            sticky="nsew",
+            padx=(0, 8),
+            pady=(8, 0)
+        )
+
+        ctk.CTkLabel(
             method_frame,
-            text="HOW",
+            text="03  HOW?",
             font=("Arial", 13, "bold"),
             text_color=self.theme["accent"]
-        )
-        method_title.pack(
+        ).pack(
             anchor="w",
             padx=20,
-            pady=(18, 12)
+            pady=(18, 4)
+        )
+
+        ctk.CTkLabel(
+            method_frame,
+            text="Choose the method supported by the evidence.",
+            font=("Arial", 11),
+            text_color=self.theme["muted"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 10)
+        )
+
+        self.method_selection_var = ctk.StringVar(
+            value=""
         )
 
         method_options = [
@@ -5439,45 +5541,74 @@ class CaseFileApp(ctk.CTk):
             "Exploited a system vulnerability"
         ]
 
-        self.method_selection_var = ctk.StringVar(value="")
-
         for option in method_options:
+
             radio = ctk.CTkRadioButton(
                 method_frame,
                 text=option,
+                variable=self.method_selection_var,
+                value=option,
                 font=("Arial", 12),
                 text_color=self.theme["text"],
-                variable=self.method_selection_var,
-                value=option
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                border_color=self.theme["border"]
             )
+
             radio.pack(
                 anchor="w",
                 padx=20,
-                pady=4
+                pady=6
             )
 
-        # MOTIVE section
+        ctk.CTkFrame(
+            method_frame,
+            height=10,
+            fg_color="transparent"
+        ).pack()
+
+        # 04 — WHY
+
         motive_frame = ctk.CTkFrame(
-            self.main_frame,
+            theory_grid,
             fg_color=self.theme["card"],
-            corner_radius=12
-        )
-        motive_frame.pack(
-            fill="x",
-            padx=40,
-            pady=(0, 15)
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
         )
 
-        motive_title = ctk.CTkLabel(
+        motive_frame.grid(
+            row=1,
+            column=1,
+            sticky="nsew",
+            padx=(8, 0),
+            pady=(8, 0)
+        )
+
+        ctk.CTkLabel(
             motive_frame,
-            text="WHY / MOTIVE",
+            text="04  WHY?",
             font=("Arial", 13, "bold"),
             text_color=self.theme["accent"]
-        )
-        motive_title.pack(
+        ).pack(
             anchor="w",
             padx=20,
-            pady=(18, 12)
+            pady=(18, 4)
+        )
+
+        ctk.CTkLabel(
+            motive_frame,
+            text="Choose the motive behind the crime.",
+            font=("Arial", 11),
+            text_color=self.theme["muted"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 10)
+        )
+
+        self.motive_selection_var = ctk.StringVar(
+            value=""
         )
 
         motive_options = [
@@ -5487,54 +5618,78 @@ class CaseFileApp(ctk.CTk):
             "Personal conflict with the victim"
         ]
 
-        self.motive_selection_var = ctk.StringVar(value="")
-
         for option in motive_options:
+
             radio = ctk.CTkRadioButton(
                 motive_frame,
                 text=option,
+                variable=self.motive_selection_var,
+                value=option,
                 font=("Arial", 12),
                 text_color=self.theme["text"],
-                variable=self.motive_selection_var,
-                value=option
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                border_color=self.theme["border"]
             )
+
             radio.pack(
                 anchor="w",
                 padx=20,
-                pady=4
+                pady=6
             )
 
-        # EVIDENCE section
+        ctk.CTkFrame(
+            motive_frame,
+            height=10,
+            fg_color="transparent"
+        ).pack()
+
+        # 05 — SUPPORTING EVIDENCE
+
         evidence_frame = ctk.CTkFrame(
             self.main_frame,
             fg_color=self.theme["card"],
-            corner_radius=12
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
         )
+
         evidence_frame.pack(
             fill="x",
             padx=40,
-            pady=(0, 15)
+            pady=(0, 18)
         )
 
-        evidence_title = ctk.CTkLabel(
+        ctk.CTkLabel(
             evidence_frame,
-            text="SUPPORTING EVIDENCE",
+            text="05  SUPPORTING EVIDENCE",
             font=("Arial", 13, "bold"),
             text_color=self.theme["accent"]
-        )
-        evidence_title.pack(
+        ).pack(
             anchor="w",
             padx=20,
-            pady=(18, 12)
+            pady=(18, 4)
         )
-        
-        # Get all available evidence for the final case theory
+
+        ctk.CTkLabel(
+            evidence_frame,
+            text="Select the evidence that supports your final theory.",
+            font=("Arial", 11),
+            text_color=self.theme["muted"]
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 12)
+        )
+
+        # Load all evidence
 
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
         cursor.execute("""
-            SELECT * FROM evidence
+            SELECT *
+            FROM evidence
             ORDER BY id
         """)
 
@@ -5543,40 +5698,69 @@ class CaseFileApp(ctk.CTk):
         cursor.close()
         connection.close()
 
+
+        evidence_grid = ctk.CTkFrame(
+            evidence_frame,
+            fg_color="transparent"
+        )
+
+        evidence_grid.pack(
+            fill="x",
+            padx=16,
+            pady=(0, 16)
+        )
+
+        evidence_grid.grid_columnconfigure(0, weight=1)
+        evidence_grid.grid_columnconfigure(1, weight=1)
+
         self.evidence_checkboxes = {}
-        for evidence in available_evidence:
+
+        for index, evidence in enumerate(available_evidence):
+
+            row = index // 2
+            column = index % 2
+
             checkbox = ctk.CTkCheckBox(
-                evidence_frame,
+                evidence_grid,
                 text=evidence["title"],
                 font=("Arial", 12),
                 text_color=self.theme["text"],
-                onvalue=True,
-                offvalue=False
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                border_color=self.theme["border"],
+                checkbox_width=20,
+                checkbox_height=20
             )
-            checkbox.pack(
-                anchor="w",
-                padx=20,
-                pady=4
-            )
-            self.evidence_checkboxes[evidence["id"]] = checkbox
 
-        # Submit button
+            checkbox.grid(
+                row=row,
+                column=column,
+                sticky="w",
+                padx=8,
+                pady=7
+            )
+
+            self.evidence_checkboxes[
+                evidence["id"]
+            ] = checkbox
+
+        # Submit
+
         submit_button = ctk.CTkButton(
             self.main_frame,
-            text="SUBMIT CASE THEORY",
-            width=250,
-            height=50,
+            text="SUBMIT CASE THEORY  →",
+            width=280,
+            height=52,
+            corner_radius=10,
+            font=("Arial", 15, "bold"),
             fg_color=self.theme["primary"],
             hover_color=self.theme["primary_hover"],
             text_color=self.theme["heading"],
-            font=("Arial", 16, "bold"),
-            corner_radius=8,
             command=self.analyze_case_theory
         )
+
         submit_button.pack(
-            anchor="center",
-            padx=40,
-            pady=(20, 30)
+            pady=(5, 35)
         )
 
     def select_resolution_suspect(self, suspect_id):
