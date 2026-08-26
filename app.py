@@ -5075,7 +5075,7 @@ class CaseFileApp(ctk.CTk):
         
         # Check if required contradictions are exposed
         required_contradictions = config["required_contradictions"]
-        contradictions_met = any(contradiction in self.discovered_leads for contradiction in required_contradictions)
+        contradictions_met = all(contradiction in self.discovered_leads for contradiction in required_contradictions)
         
         if findings_met and contradictions_met:
             self.resolution_unlocked = True
@@ -5885,18 +5885,27 @@ class CaseFileApp(ctk.CTk):
         }
 
     def analyze_motive_choice(self, theory):
-        """Analyze if the motive choice is supported by evidence"""
+
         motive_choice = theory["motive_choice"]
-        
+
         if not motive_choice:
-            return {"valid": False, "message": "No motive was established."}
-        
-        # Motive is optional - give partial credit if close
-        if motive_choice and ("financial" in motive_choice.lower() or "records" in motive_choice.lower()):
-            if "marcus_financial_pressure" in self.discovered_leads:
-                return {"valid": True, "message": "Motive is plausible but may point to the wrong suspect."}
-        
-        return {"valid": True, "message": "Motive component accepted."}
+            return {
+                "valid": False,
+                "message": "No motive was established."
+            }
+
+        correct_motive = "Evidence tampering to conceal access"
+
+        if motive_choice == correct_motive:
+            return {
+                "valid": True,
+                "message": "The motive is consistent with Sophie's attempt to conceal her involvement."
+            }
+
+        return {
+            "valid": False,
+            "message": "The selected motive does not best explain Sophie's actions."
+        }
 
     def analyze_evidence_support(self, theory):
         """Analyze if evidence choices support the theory"""
