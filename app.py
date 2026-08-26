@@ -303,6 +303,16 @@ class CaseFileApp(ctk.CTk):
                 ),
                 "evidence_ids": {1, 6},
                 "connection_type": "Person"
+            },
+            frozenset({7, 9}): {
+                "id": "sophie_security_workstation",
+                "title": "SECURITY SESSION ORIGIN",
+                "description": (
+                    "The administrator session responsible for the security blackout "
+                    "originated from workstation SEC-03, assigned to Sophie Laurent."
+                ),
+                "evidence_ids": {7, 9},
+                "connection_type": "Access / System"
             }
         }
 

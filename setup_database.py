@@ -157,6 +157,13 @@ def setup_database():
             "Physical",
             "Victim's Office",
             "Medium"
+        ),
+        (
+            "Security Workstation Activity",
+            "System activity records show that the security administrator session initiated at 10:09 PM originated from terminal SEC-03. Company asset records assign SEC-03 to Sophie Laurent for routine security administration duties.",
+            "Digital",
+            "Security Office",
+            "Critical"
         )
     ]
 
