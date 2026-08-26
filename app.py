@@ -2514,22 +2514,6 @@ class CaseFileApp(ctk.CTk):
         )
         timeline_summary_copy.pack(anchor="w", padx=20, pady=(0, 18))
 
-        for lead in leads:
-            lead_label = ctk.CTkLabel(
-                status_frame,
-                text="•  " + lead,
-                font=("Arial", 14),
-                text_color=self.theme["text"],
-                justify="left",
-                wraplength=800
-            )
-
-            lead_label.pack(
-                anchor="w",
-                padx=20,
-                pady=5
-            )
-
         next_lead_frame = ctk.CTkFrame(
             self.main_frame,
             fg_color=self.theme["card"],
