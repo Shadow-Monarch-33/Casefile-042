@@ -4663,6 +4663,11 @@ class CaseFileApp(ctk.CTk):
                     text_color=self.theme["accent"]
                 )
 
+        if hasattr(self, "case_label"):
+            self.case_label.configure(
+                text_color=self.theme["accent"]
+            )
+
     def set_theme(self, theme_name):
 
         if theme_name not in THEMES:
@@ -5149,7 +5154,7 @@ class CaseFileApp(ctk.CTk):
         evidence_title = ctk.CTkLabel(
             evidence_frame,
             text="SUPPORTING EVIDENCE",
-            font=("Arial", 13, bold"),
+            font=("Arial", 13, "bold"),
             text_color=self.theme["accent"]
         )
         evidence_title.pack(
@@ -5160,12 +5165,25 @@ class CaseFileApp(ctk.CTk):
 
         # Get investigated evidence
         investigated_ids = list(self.investigated_evidence)
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM evidence WHERE id IN (%s)" % ",".join(["%s"] * len(investigated_ids)), investigated_ids)
-        available_evidence = cursor.fetchall()
-        cursor.close()
-        connection.close()
+
+        available_evidence = []
+
+        if investigated_ids:
+
+            connection = get_connection()
+            cursor = connection.cursor(dictionary=True)
+
+            placeholders = ",".join(["%s"] * len(investigated_ids))
+
+            cursor.execute(
+                f"SELECT * FROM evidence WHERE id IN ({placeholders})",
+                investigated_ids
+            )
+
+            available_evidence = cursor.fetchall()
+
+            cursor.close()
+            connection.close()
 
         self.evidence_checkboxes = {}
         for evidence in available_evidence:
@@ -5222,16 +5240,26 @@ class CaseFileApp(ctk.CTk):
 
     def analyze_case_theory(self):
         """Analyze the submitted case theory"""
-        theory = self.current_theory
-        
+
+        theory = self.current_theory.copy()
+
+        # Collect radio-button selections
+        theory["timeline_choice"] = self.timeline_selection_var.get()
+        theory["method_choice"] = self.method_selection_var.get()
+        theory["motive_choice"] = self.motive_selection_var.get()
+
         # Collect evidence selections
         selected_evidence = set()
-        for eid, checkbox in self.evidence_checkboxes.items():
+
+        for evidence_id, checkbox in self.evidence_checkboxes.items():
             if checkbox.get():
-                selected_evidence.add(eid)
+                selected_evidence.add(evidence_id)
+
         theory["evidence_ids"] = selected_evidence
-        
-        # Analysis results
+
+        # Keep the current theory in sync
+        self.current_theory = theory
+
         results = {
             "suspect": self.analyze_suspect_choice(theory),
             "timeline": self.analyze_timeline_choice(theory),
@@ -5239,7 +5267,7 @@ class CaseFileApp(ctk.CTk):
             "motive": self.analyze_motive_choice(theory),
             "evidence": self.analyze_evidence_support(theory)
         }
-        
+
         self.show_theory_analysis(results)
 
     def analyze_suspect_choice(self, theory):
@@ -5424,16 +5452,17 @@ class CaseFileApp(ctk.CTk):
         )
 
         if all_valid:
+
             close_button = ctk.CTkButton(
                 button_frame,
-                text="CLOSE",
-                width=150,
+                text="CLOSE CASE",
+                width=170,
                 height=38,
                 fg_color=self.theme["primary"],
                 hover_color=self.theme["primary_hover"],
                 text_color=self.theme["heading"],
                 corner_radius=8,
-                command=modal.destroy
+                command=lambda: self.complete_case(modal)
             )
             close_button.pack(
                 side="right"
@@ -5454,9 +5483,17 @@ class CaseFileApp(ctk.CTk):
                 side="right"
             )
 
+    def complete_case(self, modal):
+
+        modal.destroy()
+
+        self.case_closed = True
+
+        self.show_page("case resolution")
+
     def show_case_closed_state(self):
         """Show the case closed state"""
-        closed_frame = ctk.CtkFrame(
+        closed_frame = ctk.CTkFrame(
             self.main_frame,
             fg_color=self.theme["card"],
             corner_radius=12
