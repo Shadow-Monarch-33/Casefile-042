@@ -1153,7 +1153,7 @@ class CaseFileApp(ctk.CTk):
         # Sophie's connection to the office
         # ─────────────────────────────────────
 
-        if "office_presence" not in leads:
+        if "sophie_office_presence" not in leads:
             return (
                 "Someone's presence near the victim does not automatically prove "
                 "guilt. But it can become important when combined with other "
@@ -5199,8 +5199,6 @@ class CaseFileApp(ctk.CTk):
         else:
             self.show_resolution_interface()
 
-        # self.show_resolution_interface()
-
     def show_resolution_locked(self):
         """Show locked state when resolution not yet available"""
         locked_frame = ctk.CTkFrame(
@@ -5302,6 +5300,14 @@ class CaseFileApp(ctk.CTk):
 
     def show_resolution_interface(self):
         """Show the interactive case resolution interface."""
+
+        self.current_theory = {
+            "suspect_id": None,
+            "timeline_choice": None,
+            "method_choice": None,
+            "motive_choice": None,
+            "evidence_ids": set()
+        }
 
         # GET SUSPECTS
 
@@ -5841,34 +5847,58 @@ class CaseFileApp(ctk.CTk):
             return {"valid": False, "message": "The selected suspect's involvement is not established by your current evidence."}
 
     def analyze_timeline_choice(self, theory):
-        """Analyze if the timeline choice is consistent with evidence"""
+
+        """Analyze the selected timeline."""
+
         timeline_choice = theory["timeline_choice"]
-        
+
         if not timeline_choice:
-            return {"valid": False, "message": "No timeline reconstruction was provided."}
-        
-        correct_solution = self.resolution_config["correct_solution"]
-        
-        # Check if timeline aligns with discovered evidence
-        if "blackout" in timeline_choice.lower() and "blackout_during_struggle" in self.discovered_leads:
-            return {"valid": True, "message": "Timeline is consistent with established events."}
-        else:
-            return {"valid": False, "message": "Your timeline is inconsistent with the established sequence of events."}
+            return {
+                "valid": False,
+                "message": "No timeline reconstruction was provided."
+            }
+
+        correct_timeline = (
+            "During the 10:10–10:28 PM security blackout"
+        )
+
+        if timeline_choice == correct_timeline:
+            return {
+                "valid": True,
+                "message": "Timeline is consistent with the established events."
+            }
+
+        return {
+            "valid": False,
+            "message": "Your timeline is inconsistent with the established sequence of events."
+        }
 
     def analyze_method_choice(self, theory):
-        """Analyze if the method choice is supported by evidence"""
+
+        """Analyze the selected method."""
+
         method_choice = theory["method_choice"]
-        
+
         if not method_choice:
-            return {"valid": False, "message": "No method was specified."}
-        
-        correct_solution = self.resolution_config["correct_solution"]
-        
-        # Check if method aligns with evidence
-        if "security administrator" in method_choice.lower() and "security_override_access" in self.discovered_leads:
-            return {"valid": True, "message": "Method is supported by security system evidence."}
-        else:
-            return {"valid": False, "message": "The selected method is not sufficiently established by current evidence."}
+            return {
+                "valid": False,
+                "message": "No method was specified."
+            }
+
+        correct_method = (
+            "Used security administrator access to disable cameras"
+        )
+
+        if method_choice == correct_method:
+            return {
+                "valid": True,
+                "message": "Method is supported by the security system evidence."
+            }
+
+        return {
+            "valid": False,
+            "message": "The selected method is not sufficiently supported by the evidence."
+        }
 
     def analyze_motive_choice(self, theory):
         """Analyze if the motive choice is supported by evidence"""
@@ -5906,13 +5936,31 @@ class CaseFileApp(ctk.CTk):
             }
 
     def show_theory_analysis(self, results):
-        """Show the analysis modal with results"""
-        modal = ctk.CTkFrame(
+        """Show the analysis modal with colour-coded results."""
+
+        # DARK BACKGROUND OVERLAY
+
+        overlay = ctk.CTkFrame(
             self,
-            width=550,
-            height=450,
+            fg_color="#000000",
+            corner_radius=0
+        )
+
+        overlay.place(
+            relx=0,
+            rely=0,
+            relwidth=1,
+            relheight=1
+        )
+
+        # MAIN MODAL
+
+        modal = ctk.CTkFrame(
+            overlay,
+            width=720,
+            height=650,
             fg_color=self.theme["card"],
-            corner_radius=15,
+            corner_radius=18,
             border_width=1,
             border_color=self.theme["border"]
         )
@@ -5923,124 +5971,476 @@ class CaseFileApp(ctk.CTk):
             anchor="center"
         )
 
-        # Header
+        modal.pack_propagate(False)
+
+        # HEADER
+
         header = ctk.CTkLabel(
             modal,
             text="ANALYZING CASE THEORY...",
-            font=("Arial", 18, "bold"),
+            font=("Arial", 24, "bold"),
             text_color=self.theme["heading"]
         )
+
         header.pack(
-            pady=(30, 20)
+            pady=(32, 8)
         )
 
-        # Results
-        all_valid = all(results[key]["valid"] for key in ["suspect", "timeline", "method", "evidence"])
-        
-        for category, result in results.items():
-            if category == "evidence":
-                continue
-            
-            symbol = "✓" if result["valid"] else "✕"
-            text_color = self.theme["text"] if result["valid"] else self.theme["warning"]
-            
-            result_label = ctk.CTkLabel(
-                modal,
-                text=f"{symbol} {category.upper().replace('_', ' ')}",
-                font=("Arial", 14, "bold"),
-                text_color=text_color
-            )
-            result_label.pack(
-                anchor="w",
-                padx=30,
-                pady=(8, 4)
-            )
-
-        # Evidence count
-        if "evidence" in results:
-            result = results["evidence"]
-            symbol = "✓" if result["valid"] else "✕"
-            text_color = self.theme["text"] if result["valid"] else self.theme["warning"]
-            
-            evidence_label = ctk.CTkLabel(
-                modal,
-                text=f"{symbol} SUPPORTING EVIDENCE: {result.get('count', 0)}",
-                font=("Arial", 14, "bold"),
-                text_color=text_color
-            )
-            evidence_label.pack(
-                anchor="w",
-                padx=30,
-                pady=(8, 20)
-            )
-
-        # Feedback message
-        feedback_messages = [results[key]["message"] for key in ["suspect", "timeline", "method", "evidence"] if not results[key]["valid"]]
-        
-        if feedback_messages:
-            feedback = ctk.CTkLabel(
-                modal,
-                text=feedback_messages[0],
-                font=("Arial", 13),
-                text_color=self.theme["muted"],
-                wraplength=480,
-                justify="center"
-            )
-            feedback.pack(
-                padx=30,
-                pady=(0, 20)
-            )
-
-        # Action buttons
-        button_frame = ctk.CTkFrame(
+        subtitle = ctk.CTkLabel(
             modal,
-            fg_color="transparent"
+            text="Reviewing your conclusions against the available evidence",
+            font=("Arial", 13),
+            text_color=self.theme["muted"]
         )
-        button_frame.pack(
-            fill="x",
-            padx=30,
+
+        subtitle.pack(
             pady=(0, 20)
         )
 
+        # RESULT COLOURS
+
+        correct_color = "#22C55E"
+        correct_bg = "#102B1B"
+
+        incorrect_color = "#FF3B3B"
+        incorrect_bg = "#321515"
+
+        # CHECK OVERALL RESULT
+
+        required_categories = [
+            "suspect",
+            "timeline",
+            "method",
+            "motive",
+            "evidence"
+        ]
+
+        all_valid = all(
+            results[key]["valid"]
+            for key in required_categories
+            if key in results
+        )
+
+        # RESULT ROWS
+
+        categories = [
+            ("suspect", "SUSPECT"),
+            ("timeline", "TIMELINE"),
+            ("method", "METHOD"),
+            ("motive", "MOTIVE"),
+            ("evidence", "SUPPORTING EVIDENCE")
+        ]
+
+        for key, title in categories:
+
+            if key not in results:
+                continue
+
+            result = results[key]
+
+            is_correct = result["valid"]
+
+            accent_color = (
+                correct_color
+                if is_correct
+                else incorrect_color
+            )
+
+            background_color = (
+                correct_bg
+                if is_correct
+                else incorrect_bg
+            )
+
+            symbol = "✓" if is_correct else "✕"
+
+            status_text = (
+                "CORRECT"
+                if is_correct
+                else "INCORRECT"
+            )
+
+
+            # Main result card
+            result_frame = ctk.CTkFrame(
+                modal,
+                height=58,
+                fg_color=background_color,
+                corner_radius=10,
+                border_width=1,
+                border_color=accent_color
+            )
+
+            result_frame.pack(
+                fill="x",
+                padx=30,
+                pady=4
+            )
+
+            result_frame.pack_propagate(False)
+
+
+            # Left side
+            left_frame = ctk.CTkFrame(
+                result_frame,
+                fg_color="transparent"
+            )
+
+            left_frame.pack(
+                side="left",
+                fill="y",
+                padx=18
+            )
+
+
+            symbol_label = ctk.CTkLabel(
+                left_frame,
+                text=symbol,
+                font=("Arial", 24, "bold"),
+                text_color=accent_color,
+                width=30
+            )
+
+            symbol_label.pack(
+                side="left",
+                padx=(0, 10)
+            )
+
+
+            title_label = ctk.CTkLabel(
+                left_frame,
+                text=title,
+                font=("Arial", 14, "bold"),
+                text_color=accent_color
+            )
+
+            title_label.pack(
+                side="left"
+            )
+
+
+            # Right side
+            right_frame = ctk.CTkFrame(
+                result_frame,
+                fg_color="transparent"
+            )
+
+            right_frame.pack(
+                side="right",
+                fill="y",
+                padx=18
+            )
+
+
+            status_label = ctk.CTkLabel(
+                right_frame,
+                text=status_text,
+                font=("Arial", 11, "bold"),
+                text_color=accent_color
+            )
+
+            status_label.pack(
+                side="top",
+                anchor="e",
+                pady=(8, 0)
+            )
+
+
+            # For evidence, show selected count
+            if key == "evidence":
+
+                detail = (
+                    f"{result.get('count', 0)} evidence selected"
+                )
+
+            else:
+
+                detail = result.get(
+                    "message",
+                    ""
+                )
+
+
+            detail_label = ctk.CTkLabel(
+                right_frame,
+                text=detail,
+                font=("Arial", 10),
+                text_color=self.theme["text"],
+                wraplength=300,
+                justify="right"
+            )
+
+            detail_label.pack(
+                side="top",
+                anchor="e"
+            )
+
+        # SUMMARY
+
+        correct_count = sum(
+            1
+            for key in required_categories
+            if key in results and results[key]["valid"]
+        )
+
+        incorrect_count = len(
+            [
+                key
+                for key in required_categories
+                if key in results and not results[key]["valid"]
+            ]
+        )
+
+
+        summary_frame = ctk.CTkFrame(
+            modal,
+            fg_color="transparent"
+        )
+
+        summary_frame.pack(
+            pady=(15, 12)
+        )
+
+
+        correct_label = ctk.CTkLabel(
+            summary_frame,
+            text=f"✓ {correct_count} CORRECT",
+            font=("Arial", 14, "bold"),
+            text_color=correct_color
+        )
+
+        correct_label.pack(
+            side="left",
+            padx=20
+        )
+
+
+        incorrect_label = ctk.CTkLabel(
+            summary_frame,
+            text=f"✕ {incorrect_count} INCORRECT",
+            font=("Arial", 14, "bold"),
+            text_color=incorrect_color
+        )
+
+        incorrect_label.pack(
+            side="left",
+            padx=20
+        )
+
+        # FINAL MESSAGE
+
         if all_valid:
 
-            close_button = ctk.CTkButton(
-                button_frame,
-                text="CLOSE CASE",
-                width=170,
-                height=38,
-                fg_color=self.theme["primary"],
-                hover_color=self.theme["primary_hover"],
-                text_color=self.theme["heading"],
-                corner_radius=8,
-                command=lambda: self.complete_case(modal)
+            message = (
+                "Your theory is fully supported by the evidence."
             )
-            close_button.pack(
-                side="right"
-            )
+
+            message_color = correct_color
+
         else:
-            continue_button = ctk.CTkButton(
-                button_frame,
-                text="CONTINUE INVESTIGATION",
-                width=200,
-                height=38,
+
+            message = (
+                "Your theory has gaps. Revisit the evidence "
+                "and investigate the connections you may have missed."
+            )
+
+            message_color = self.theme["muted"]
+
+
+        feedback_label = ctk.CTkLabel(
+            modal,
+            text=message,
+            font=("Arial", 12),
+            text_color=message_color,
+            wraplength=600,
+            justify="center"
+        )
+
+        feedback_label.pack(
+            padx=40,
+            pady=(0, 15)
+        )
+
+        # ACTION BUTTON
+
+        if all_valid:
+
+            action_button = ctk.CTkButton(
+                modal,
+                text="CLOSE CASE  →",
+                width=240,
+                height=46,
+                font=("Arial", 14, "bold"),
+                corner_radius=10,
+                fg_color=correct_color,
+                hover_color="#16A34A",
+                text_color="#FFFFFF",
+                command=lambda: self.complete_case(overlay)
+            )
+
+        else:
+
+            action_button = ctk.CTkButton(
+                modal,
+                text="CONTINUE INVESTIGATION  →",
+                width=260,
+                height=46,
+                font=("Arial", 14, "bold"),
+                corner_radius=10,
                 fg_color=self.theme["primary"],
                 hover_color=self.theme["primary_hover"],
                 text_color=self.theme["heading"],
-                corner_radius=8,
-                command=modal.destroy
-            )
-            continue_button.pack(
-                side="right"
+                command=overlay.destroy
             )
 
-    def complete_case(self, modal):
 
-        modal.destroy()
+        action_button.pack(
+            pady=(0, 25)
+        )
+
+    def complete_case(self, overlay):
 
         self.case_closed = True
+        self.resolution_unlocked = True
 
-        self.show_page("case resolution")
+        # Close the theory analysis modal
+        overlay.destroy()
+
+        # Save progress if you have a save function
+        if hasattr(self, "save_game_state"):
+            self.save_game_state()
+
+        # CASE CLOSED OVERLAY
+
+        congrats_overlay = ctk.CTkFrame(
+            self,
+            fg_color="#000000",
+            corner_radius=0
+        )
+
+        congrats_overlay.place(
+            relx=0,
+            rely=0,
+            relwidth=1,
+            relheight=1
+        )
+
+        # CONGRATULATIONS CARD
+
+        congrats_card = ctk.CTkFrame(
+            congrats_overlay,
+            width=700,
+            height=480,
+            fg_color=self.theme["card"],
+            corner_radius=20,
+            border_width=1,
+            border_color="#22C55E"
+        )
+
+        congrats_card.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        congrats_card.pack_propagate(False)
+
+        # CASE CLOSED LABEL
+
+        closed_label = ctk.CTkLabel(
+            congrats_card,
+            text="CASE CLOSED",
+            font=("Arial", 14, "bold"),
+            text_color="#22C55E"
+        )
+
+        closed_label.pack(
+            pady=(55, 8)
+        )
+
+        # MAIN TITLE
+
+        title = ctk.CTkLabel(
+            congrats_card,
+            text="CONGRATULATIONS, DETECTIVE.",
+            font=("Arial", 28, "bold"),
+            text_color=self.theme["heading"]
+        )
+
+        title.pack(
+            pady=(0, 18)
+        )
+
+        # MESSAGE
+
+        message = ctk.CTkLabel(
+            congrats_card,
+            text=(
+                "Your investigation connected the evidence, exposed "
+                "the contradictions, and reconstructed what happened "
+                "during the critical security window."
+            ),
+            font=("Arial", 14),
+            text_color=self.theme["text"],
+            wraplength=560,
+            justify="center"
+        )
+
+        message.pack(
+            padx=50,
+            pady=(0, 25)
+        )
+
+        # DIVIDER
+
+        divider = ctk.CTkFrame(
+            congrats_card,
+            height=1,
+            fg_color=self.theme["border"]
+        )
+
+        divider.pack(
+            fill="x",
+            padx=70,
+            pady=(0, 22)
+        )
+
+        # FINAL MESSAGE
+
+        final_label = ctk.CTkLabel(
+            congrats_card,
+            text="CASE #042 SUCCESSFULLY RESOLVED",
+            font=("Arial", 13, "bold"),
+            text_color="#22C55E"
+        )
+
+        final_label.pack(
+            pady=(0, 30)
+        )
+
+        # RETURN BUTTON
+
+        def finish_case():
+
+            congrats_overlay.destroy()
+
+            self.show_case_summary()
+
+
+        finish_button = ctk.CTkButton(
+            congrats_card,
+            text="VIEW CASE SUMMARY  →",
+            width=240,
+            height=46,
+            font=("Arial", 14, "bold"),
+            corner_radius=10,
+            fg_color="#22C55E",
+            hover_color="#16A34A",
+            text_color="#FFFFFF",
+            command=finish_case
+        )
+
+        finish_button.pack()
 
     def show_case_closed_state(self):
         """Show the case closed state"""
@@ -6171,6 +6571,304 @@ class CaseFileApp(ctk.CTk):
             padx=20,
             pady=(0, 18)
         )
+
+    def show_case_summary(self):
+
+        # CLEAR THE ENTIRE WINDOW
+
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        # FULL SCREEN BACKGROUND
+
+        summary_page = ctk.CTkFrame(
+            self,
+            fg_color=self.theme["background"],
+            corner_radius=0
+        )
+
+        summary_page.pack(
+            fill="both",
+            expand=True
+        )
+
+        # CONTENT CONTAINER
+
+        content = ctk.CTkFrame(
+            summary_page,
+            fg_color="transparent"
+        )
+
+        content.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center",
+            relwidth=0.72,
+            relheight=0.88
+        )
+
+        # CASE CLOSED LABEL
+
+        case_closed_label = ctk.CTkLabel(
+            content,
+            text="CASEFILE / CASE CLOSED",
+            font=("Arial", 13, "bold"),
+            text_color="#22C55E"
+        )
+
+        case_closed_label.pack(
+            anchor="w",
+            pady=(10, 8)
+        )
+
+        # TITLE
+
+        title = ctk.CTkLabel(
+            content,
+            text="What Really Happened",
+            font=("Arial", 38, "bold"),
+            text_color=self.theme["heading"]
+        )
+
+        title.pack(
+            anchor="w"
+        )
+
+
+        subtitle = ctk.CTkLabel(
+            content,
+            text=(
+                "The investigation revealed how the murder was concealed "
+                "and why the evidence pointed to Sophie Laurent."
+            ),
+            font=("Arial", 15),
+            text_color=self.theme["muted"],
+            wraplength=850,
+            justify="left"
+        )
+
+        subtitle.pack(
+            anchor="w",
+            pady=(10, 28)
+        )
+
+        # DIVIDER
+
+        divider = ctk.CTkFrame(
+            content,
+            height=1,
+            fg_color=self.theme["border"]
+        )
+
+        divider.pack(
+            fill="x",
+            pady=(0, 25)
+        )
+
+        # SUMMARY POINTS    
+
+        summary_points = [
+
+            (
+                "01",
+                "The confrontation",
+                (
+                    "Sophie Laurent had a strong reason to confront the victim. "
+                    "The victim had discovered that security access logs had been "
+                    "altered under her credentials, placing Sophie's position and "
+                    "career at serious risk."
+                )
+            ),
+
+            (
+                "02",
+                "The cameras were disabled",
+                (
+                    "At 10:10 PM, the executive floor CCTV system was manually "
+                    "overridden using security administrator access. The cameras "
+                    "remained offline until 10:28 PM, creating a window in which "
+                    "the confrontation could take place without being recorded."
+                )
+            ),
+
+            (
+                "03",
+                "Sophie was inside the victim's office",
+                (
+                    "A second coffee cup recovered from the victim's office "
+                    "contained traces of Sophie's lipstick. This directly placed "
+                    "her in the office and contradicted the idea that she remained "
+                    "only in the security office reviewing footage."
+                )
+            ),
+
+            (
+                "04",
+                "The struggle occurred during the blackout",
+                (
+                    "The victim's broken watch stopped at approximately 10:24 PM. "
+                    "This placed the struggle directly inside the CCTV blackout, "
+                    "at a time when the executive floor was deliberately left "
+                    "without camera coverage."
+                )
+            ),
+
+            (
+                "05",
+                "Other suspects were eliminated",
+                (
+                    "Noah Bennett was confirmed by CCTV to be inside the server "
+                    "room during the estimated time of the struggle. Marcus Reid's "
+                    "alibi was inconsistent, but the available evidence did not "
+                    "place him at the crime scene. Elena's access card created "
+                    "suspicion, but it did not establish that she committed the murder."
+                )
+            ),
+
+            (
+                "06",
+                "The conclusion",
+                (
+                    "The strongest combination of motive, opportunity, physical "
+                    "presence, and control over the CCTV system pointed to Sophie "
+                    "Laurent. She used her access to create the security blackout, "
+                    "confronted the victim, and the confrontation turned deadly."
+                )
+            )
+
+        ]
+
+        # CREATE SUMMARY CARDS        
+
+        for number, heading, description in summary_points:
+
+            point_frame = ctk.CTkFrame(
+                content,
+                fg_color=self.theme["card"],
+                corner_radius=12,
+                border_width=1,
+                border_color=self.theme["border"]
+            )
+
+            point_frame.pack(
+                fill="x",
+                pady=6
+            )
+
+            # Number
+
+            number_label = ctk.CTkLabel(
+                point_frame,
+                text=number,
+                font=("Arial", 16, "bold"),
+                text_color="#22C55E",
+                width=55
+            )
+
+            number_label.pack(
+                side="left",
+                padx=(20, 12),
+                pady=16
+            )
+
+            # Text container
+
+            text_container = ctk.CTkFrame(
+                point_frame,
+                fg_color="transparent"
+            )
+
+            text_container.pack(
+                side="left",
+                fill="both",
+                expand=True,
+                padx=(0, 25),
+                pady=14
+            )
+
+
+            heading_label = ctk.CTkLabel(
+                text_container,
+                text=heading,
+                font=("Arial", 15, "bold"),
+                text_color=self.theme["heading"],
+                anchor="w"
+            )
+
+            heading_label.pack(
+                anchor="w"
+            )
+
+
+            description_label = ctk.CTkLabel(
+                text_container,
+                text=description,
+                font=("Arial", 12),
+                text_color=self.theme["text"],
+                wraplength=800,
+                justify="left",
+                anchor="w"
+            )
+
+            description_label.pack(
+                anchor="w",
+                pady=(5, 0)
+            )
+
+        # FINAL DIVIDER
+
+        bottom_divider = ctk.CTkFrame(
+            content,
+            height=1,
+            fg_color=self.theme["border"]
+        )
+
+        bottom_divider.pack(
+            fill="x",
+            pady=(25, 15)
+        )
+
+        # FINAL STATUS
+
+        solved_label = ctk.CTkLabel(
+            content,
+            text="CASE #042  •  RESOLVED",
+            font=("Arial", 13, "bold"),
+            text_color="#22C55E"
+        )
+
+        solved_label.pack(
+            anchor="w"
+        )
+
+        # RETURN BUTTON
+
+        return_button = ctk.CTkButton(
+            content,
+            text="RETURN TO CASEFILE  →",
+            width=220,
+            height=44,
+            font=("Arial", 13, "bold"),
+            corner_radius=10,
+            fg_color=self.theme["primary"],
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["heading"],
+            command=self.restart_casefile_interface
+        )
+
+        return_button.pack(
+            anchor="w",
+            pady=(15, 10)
+        )
+
+    def restart_casefile_interface(self):
+
+        for widget in self.winfo_children():
+            widget.destroy()
+
+        self.create_layout()
+
+        self.show_page("case resolution")
 
 if __name__ == "__main__":
     app = CaseFileApp()
