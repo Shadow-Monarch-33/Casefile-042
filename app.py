@@ -91,6 +91,7 @@ class CaseFileApp(ctk.CTk):
         self.discovered_leads = set()
         self.hints_used = 0
         self.max_hints = 2
+        self.shown_hints = set()
 
         self.discovery_history = []
         self.asked_questions = {}
@@ -1267,8 +1268,12 @@ class CaseFileApp(ctk.CTk):
         # Get the best hint for current progress
         hint = self.get_contextual_hint()
 
-        # Consume a hint
-        self.hints_used += 1
+        # Only consume a hint if this is a new hint
+        is_new_hint = hint not in self.shown_hints
+
+        if is_new_hint:
+            self.shown_hints.add(hint)
+            self.hints_used += 1
 
         remaining = self.max_hints - self.hints_used
 
@@ -1291,7 +1296,11 @@ class CaseFileApp(ctk.CTk):
 
         title = ctk.CTkLabel(
             dialog,
-            text=f"💡 INVESTIGATION HINT  {self.hints_used}/2",
+            text=(
+                f"💡 INVESTIGATION HINT  {self.hints_used}/2"
+                if is_new_hint
+                else f"💡 PREVIOUS HINT  •  {self.hints_used}/2 USED"
+            ),
             font=("Arial", 18, "bold"),
             text_color=self.theme["accent"]
         )
