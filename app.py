@@ -19,7 +19,11 @@ THEMES = {
         "heading": "#FFFFFF",
         "text": "#D5DCE8",
         "muted": "#7D8DA6",
-        "warning": "#D4A72C"
+        "warning": "#D4A72C",
+        "importance_low": "#6B7280",
+        "importance_medium": "#D4A72C",
+        "importance_high": "#E67E22",
+        "importance_critical": "#E74C3C"
     },
 
     "Crimson Noir": {
@@ -33,7 +37,11 @@ THEMES = {
         "heading": "#FFFFFF",
         "text": "#E4D7DA",
         "muted": "#A68B91",
-        "warning": "#D4A72C"
+        "warning": "#D4A72C",
+        "importance_low": "#6B7280",
+        "importance_medium": "#D4A72C",
+        "importance_high": "#E67E22",
+        "importance_critical": "#E74C3C"
     },
 
     "Emerald Investigation": {
@@ -47,7 +55,11 @@ THEMES = {
         "heading": "#FFFFFF",
         "text": "#D2E5DD",
         "muted": "#819C91",
-        "warning": "#D4A72C"
+        "warning": "#D4A72C",
+        "importance_low": "#6B7280",
+        "importance_medium": "#D4A72C",
+        "importance_high": "#E67E22",
+        "importance_critical": "#E74C3C"
     },
 
     "Monochrome": {
@@ -61,7 +73,11 @@ THEMES = {
         "heading": "#FFFFFF",
         "text": "#DDDDDD",
         "muted": "#999999",
-        "warning": "#D4A72C"
+        "warning": "#D4A72C",
+        "importance_low": "#6B7280",
+        "importance_medium": "#D4A72C",
+        "importance_high": "#E67E22",
+        "importance_critical": "#E74C3C"
     }
 }
 
@@ -522,7 +538,7 @@ class CaseFileApp(ctk.CTk):
             self,
             width=240,
             corner_radius=0,
-            fg_color="#0B1F3A"
+            fg_color=self.theme["sidebar"]
         )
 
         self.sidebar.pack(
@@ -537,7 +553,7 @@ class CaseFileApp(ctk.CTk):
             self.sidebar,
             text="CASEFILE",
             font=("Arial", 28, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
 
         self.logo_label.pack(
@@ -550,7 +566,7 @@ class CaseFileApp(ctk.CTk):
             self.sidebar,
             text="CASE #042",
             font=("Arial", 13),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         self.case_label.pack(
@@ -563,7 +579,7 @@ class CaseFileApp(ctk.CTk):
         self.main_frame = ctk.CTkScrollableFrame(
             self,
             corner_radius=0,
-            fg_color="#101827"
+            fg_color=self.theme["background"]
         )
 
         self.main_frame.pack(
@@ -603,7 +619,7 @@ class CaseFileApp(ctk.CTk):
         # Dark overlay
         overlay = ctk.CTkFrame(
             self,
-            fg_color="#0A101B",
+            fg_color=self.theme["background"],
             corner_radius=0
         )
 
@@ -619,10 +635,10 @@ class CaseFileApp(ctk.CTk):
             overlay,
             width=760,
             height=600,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=18,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         briefing.place(
@@ -638,7 +654,7 @@ class CaseFileApp(ctk.CTk):
             briefing,
             text="CASEFILE",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         casefile_label.pack(
@@ -650,7 +666,7 @@ class CaseFileApp(ctk.CTk):
             briefing,
             text="CASE #042",
             font=("Arial", 28, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
 
         case_number.pack()
@@ -659,7 +675,7 @@ class CaseFileApp(ctk.CTk):
         divider = ctk.CTkFrame(
             briefing,
             height=1,
-            fg_color="#2A3D57"
+            fg_color=self.theme["border"]
         )
 
         divider.pack(
@@ -673,7 +689,7 @@ class CaseFileApp(ctk.CTk):
             briefing,
             text="INITIAL BRIEFING",
             font=("Arial", 12, "bold"),
-            text_color="#D4A72C"
+            text_color=self.theme["warning"]
         )
 
         briefing_label.pack()
@@ -683,7 +699,7 @@ class CaseFileApp(ctk.CTk):
             briefing,
             text="",
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="center",
             wraplength=620
         )
@@ -698,7 +714,7 @@ class CaseFileApp(ctk.CTk):
         briefing_pages = [
             {
                 "heading": "THE INCIDENT",
-                "heading_color": "#D4A72C",
+                "heading_color": self.theme["warning"],
                 "text": (
                     "At approximately 11:05 PM, a member of staff was found dead "
                     "inside an office on the executive floor.\n\n"
@@ -716,7 +732,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "THE CRITICAL WINDOW",
-                "heading_color": "#9CCBFF",
+                "heading_color": self.theme["accent"],
                 "text": (
                     "Investigators have identified the period between 10:00 PM and "
                     "11:05 PM as the most important unresolved period of the case.\n\n"
@@ -733,7 +749,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "THE PEOPLE INVOLVED",
-                "heading_color": "#9CCBFF",
+                "heading_color": self.theme["accent"],
                 "text": (
                     "Four individuals are currently connected to the investigation.\n\n"
 
@@ -751,7 +767,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "INITIAL CASE MATERIAL",
-                "heading_color": "#9CCBFF",
+                "heading_color": self.theme["accent"],
                 "text": (
                     "Your investigation begins with access to the evidence collected "
                     "from the case.\n\n"
@@ -770,7 +786,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "HOW TO INVESTIGATE",
-                "heading_color": "#9CCBFF",
+                "heading_color": self.theme["accent"],
                 "text": (
                     "Examine the available evidence and look for meaningful "
                     "relationships between different records.\n\n"
@@ -788,7 +804,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "YOUR OBJECTIVE",
-                "heading_color": "#0BFB0B",
+                "heading_color": self.theme["accent"],
                 "text": (
                     "Examine the evidence.\n\n"
 
@@ -894,9 +910,9 @@ class CaseFileApp(ctk.CTk):
             width=240,
             height=44,
             font=("Arial", 14, "bold"),
-            fg_color="#1C4F82",
-            hover_color="#2868A5",
-            text_color="#FFFFFF"
+            fg_color=self.theme["primary"],
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["heading"]
         )
 
 
@@ -931,8 +947,8 @@ class CaseFileApp(ctk.CTk):
                 height=45,
                 corner_radius=8,
                 fg_color="transparent",
-                hover_color="#16345C",
-                text_color="#D5DCE8",
+                hover_color=self.theme["primary"],
+                text_color=self.theme["text"],
                 command=lambda target=page_name: self.show_page(target)
             )
             button.pack(side="left", fill="x", expand=True, padx=(0, 8))
@@ -944,8 +960,8 @@ class CaseFileApp(ctk.CTk):
                 height=24,
                 corner_radius=12,
                 font=("Arial", 11, "bold"),
-                fg_color="#1C2C44",
-                text_color="#7FA9D8"
+                fg_color=self.theme["card"],
+                text_color=self.theme["accent"]
             )
             if page_name in ("deduction board", "timeline"):
                 badge.pack(side="right", padx=(0, 6))
@@ -957,15 +973,38 @@ class CaseFileApp(ctk.CTk):
             self.nav_badges[page_name] = badge
 
     def update_nav_state(self):
+
         for page_name, button in self.nav_buttons.items():
-            is_active = page_name == self.current_page
-            self.nav_button_rows[page_name].configure(
-                fg_color="#16345C" if is_active else "transparent",
-                border_color="#2C507F" if is_active else "#202020"
+
+            is_active = (
+                page_name == self.current_page
             )
+
+            self.nav_button_rows[page_name].configure(
+                fg_color=(
+                    self.theme["primary"]
+                    if is_active
+                    else "transparent"
+                ),
+                border_color=(
+                    self.theme["accent"]
+                    if is_active
+                    else self.theme["border"]
+                )
+            )
+
             button.configure(
-                fg_color="#16345C" if is_active else "transparent",
-                text_color="#FFFFFF" if is_active else "#D5DCE8"
+                fg_color=(
+                    self.theme["primary"]
+                    if is_active
+                    else "transparent"
+                ),
+                text_color=(
+                    self.theme["heading"]
+                    if is_active
+                    else self.theme["text"]
+                ),
+                hover_color=self.theme["primary_hover"]
             )
 
     def rebuild_findings_metadata(self):
@@ -991,22 +1030,52 @@ class CaseFileApp(ctk.CTk):
         self.findings_metadata = findings
 
     def update_case_progress(self):
+
         if "deduction board" in self.nav_badges:
+
             findings_count = len(self.discovered_leads)
+
             badge = self.nav_badges["deduction board"]
+
             if findings_count:
-                badge.configure(text=str(findings_count), fg_color="#1C2C44", text_color="#FFFFFF")
-                badge.pack(side="right", padx=(0, 6))
+
+                badge.configure(
+                    text=str(findings_count),
+                    fg_color=self.theme["card"],
+                    text_color=self.theme["heading"]
+                )
+
+                badge.pack(
+                    side="right",
+                    padx=(0, 6)
+                )
+
             else:
+
                 badge.pack_forget()
 
+
         if "timeline" in self.nav_badges:
+
             discovered, total = self.get_timeline_progress()
+
             timeline_badge = self.nav_badges["timeline"]
+
             if discovered:
-                timeline_badge.configure(text=str(discovered), fg_color="#1C2C44", text_color="#FFFFFF")
-                timeline_badge.pack(side="right", padx=(0, 6))
+
+                timeline_badge.configure(
+                    text=str(discovered),
+                    fg_color=self.theme["card"],
+                    text_color=self.theme["heading"]
+                )
+
+                timeline_badge.pack(
+                    side="right",
+                    padx=(0, 6)
+                )
+
             else:
+
                 timeline_badge.pack_forget()
 
     def discover_finding(self, finding_id):
@@ -1617,7 +1686,7 @@ class CaseFileApp(ctk.CTk):
             header,
             text=f"CASEFILE / {section_name.upper()}",
             font=("Arial", 12, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         breadcrumb.pack(anchor="w")
 
@@ -1625,7 +1694,7 @@ class CaseFileApp(ctk.CTk):
             header,
             text=title,
             font=("Arial", 32, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         title_label.pack(anchor="w", pady=(6, 4))
 
@@ -1633,7 +1702,7 @@ class CaseFileApp(ctk.CTk):
             header,
             text=subtitle,
             font=("Arial", 14),
-            text_color="#8B9BB4"
+            text_color=self.theme["muted"]
         )
         subtitle_label.pack(anchor="w")
 
@@ -1689,10 +1758,10 @@ class CaseFileApp(ctk.CTk):
         modal = ctk.CTkFrame(
             self,
             width=540,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
 
@@ -1712,7 +1781,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=header_text,
             font=("Arial", 16, "bold"),
-            text_color="#D4A72C"
+            text_color=self.theme["warning"]
         )
         title.pack(pady=(30, 12))
 
@@ -1720,7 +1789,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=source_text,
             font=("Arial", 11, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         source_label.pack(pady=(0, 10))
 
@@ -1728,7 +1797,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=title_text,
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         finding_title.pack(pady=(0, 10))
 
@@ -1736,7 +1805,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=description_text,
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             wraplength=420,
             justify="center"
         )
@@ -1754,13 +1823,13 @@ class CaseFileApp(ctk.CTk):
             extras.append("Interview Question Available  •  " + ", ".join(unlocked_suspects))
 
         if extras:
-            extras_frame = ctk.CTkFrame(modal, fg_color="#162235", corner_radius=10)
+            extras_frame = ctk.CTkFrame(modal, fg_color=self.theme["card"], corner_radius=10)
             extras_frame.pack(padx=35, pady=(0, 18), fill="x")
             extras_title = ctk.CTkLabel(
                 extras_frame,
                 text="NEW",
                 font=("Arial", 11, "bold"),
-                text_color="#7FA9D8"
+                text_color=self.theme["accent"]
             )
             extras_title.pack(anchor="w", padx=14, pady=(10, 4))
             for extra in extras:
@@ -1768,7 +1837,7 @@ class CaseFileApp(ctk.CTk):
                     extras_frame,
                     text="•  " + extra,
                     font=("Arial", 12, "bold"),
-                    text_color="#D5DCE8"
+                    text_color=self.theme["text"]
                 )
                 extra_label.pack(anchor="w", padx=14, pady=2)
             spacer = ctk.CTkLabel(extras_frame, text="", height=8)
@@ -1786,9 +1855,9 @@ class CaseFileApp(ctk.CTk):
                 text="VIEW TIMELINE",
                 width=150,
                 height=40,
-                fg_color="#1D4E89",
-                hover_color="#2863A8",
-                text_color="#FFFFFF",
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                text_color=self.theme["heading"],
                 command=lambda: self.open_timeline(close_targets, focus_event_id)
             )
             view_timeline_button.pack(side="left", padx=(0, 8))
@@ -1799,9 +1868,9 @@ class CaseFileApp(ctk.CTk):
                 text="VIEW CASE FINDINGS",
                 width=180,
                 height=40,
-                fg_color="#1D4E89" if not (timeline_new or timeline_updated) else "#1C2C44",
-                hover_color="#2863A8" if not (timeline_new or timeline_updated) else "#2A3D57",
-                text_color="#FFFFFF",
+                fg_color=self.theme["primary"] if not (timeline_new or timeline_updated) else self.theme["card"],
+                hover_color=self.theme["primary_hover"] if not (timeline_new or timeline_updated) else self.theme["border"],
+                text_color=self.theme["heading"],
                 command=lambda: self.open_case_findings(close_targets)
             )
             view_button.pack(side="left", padx=(0, 8))
@@ -1811,9 +1880,9 @@ class CaseFileApp(ctk.CTk):
             text="CONTINUE",
             width=120,
             height=40,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         continue_button.pack(side="left", padx=(8, 0))
@@ -1828,7 +1897,7 @@ class CaseFileApp(ctk.CTk):
         # Case summary
         summary_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -1842,7 +1911,7 @@ class CaseFileApp(ctk.CTk):
             summary_frame,
             text="CASE SUMMARY",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         summary_title.pack(
@@ -1859,7 +1928,7 @@ class CaseFileApp(ctk.CTk):
                 "suspicious activity during the estimated time of death."
             ),
             font=("Arial", 15),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=800
         )
@@ -1914,7 +1983,7 @@ class CaseFileApp(ctk.CTk):
 
             card = ctk.CTkFrame(
                 stats_frame,
-                fg_color="#162235",
+                fg_color=self.theme["card"],
                 corner_radius=12
             )
 
@@ -1929,7 +1998,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=number,
                 font=("Arial", 28, "bold"),
-                text_color="#FFFFFF"
+                text_color=self.theme["heading"]
             )
 
             number_label.pack(
@@ -1940,7 +2009,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=label,
                 font=("Arial", 11, "bold"),
-                text_color="#7D8DA6"
+                text_color=self.theme["muted"]
             )
 
             text_label.pack(
@@ -1949,7 +2018,7 @@ class CaseFileApp(ctk.CTk):
 
         status_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -1963,7 +2032,7 @@ class CaseFileApp(ctk.CTk):
             status_frame,
             text="INVESTIGATION STATUS",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         leads_title.pack(
@@ -1983,7 +2052,7 @@ class CaseFileApp(ctk.CTk):
                 status_frame,
                 text="•  " + lead,
                 font=("Arial", 14),
-                text_color="#D5DCE8",
+                text_color=self.theme["text"],
                 justify="left",
                 wraplength=800
             )
@@ -1997,7 +2066,7 @@ class CaseFileApp(ctk.CTk):
         timeline_discovered, timeline_total = self.get_timeline_progress()
         timeline_summary = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
         timeline_summary.pack(fill="x", padx=40, pady=(0, 15))
@@ -2006,7 +2075,7 @@ class CaseFileApp(ctk.CTk):
             timeline_summary,
             text="TIMELINE RECONSTRUCTED",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         timeline_summary_title.pack(anchor="w", padx=20, pady=(18, 8))
 
@@ -2014,7 +2083,7 @@ class CaseFileApp(ctk.CTk):
             timeline_summary,
             text=f"{timeline_discovered} / {timeline_total} EVENTS DISCOVERED",
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         timeline_summary_count.pack(anchor="w", padx=20, pady=(0, 8))
 
@@ -2022,7 +2091,7 @@ class CaseFileApp(ctk.CTk):
             timeline_summary,
             text="The night is reconstructed as connections, contradictions, and interviews fill in missing time.",
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=800
         )
@@ -2033,7 +2102,7 @@ class CaseFileApp(ctk.CTk):
                 status_frame,
                 text="•  " + lead,
                 font=("Arial", 14),
-                text_color="#D5DCE8",
+                text_color=self.theme["text"],
                 justify="left",
                 wraplength=800
             )
@@ -2046,7 +2115,7 @@ class CaseFileApp(ctk.CTk):
 
         next_lead_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -2060,7 +2129,7 @@ class CaseFileApp(ctk.CTk):
             next_lead_frame,
             text="NEXT LEAD",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         next_lead_title.pack(
@@ -2073,7 +2142,7 @@ class CaseFileApp(ctk.CTk):
             next_lead_frame,
             text=self.get_next_lead_text(),
             font=("Arial", 15),
-            text_color="#FFFFFF",
+            text_color=self.theme["heading"],
             justify="left",
             wraplength=800
         )
@@ -2092,7 +2161,7 @@ class CaseFileApp(ctk.CTk):
                     next_lead_frame,
                     text=f"RECENT DISCOVERY  •  {recent_finding['title']}",
                     font=("Arial", 12, "bold"),
-                    text_color="#D4A72C"
+                    text_color=self.theme["warning"]
                 )
                 recent_label.pack(
                     anchor="w",
@@ -2104,7 +2173,7 @@ class CaseFileApp(ctk.CTk):
                 next_lead_frame,
                 text="Start by opening critical evidence and questioning suspects to build your first findings.",
                 font=("Arial", 12),
-                text_color="#8B9BB4",
+                text_color=self.theme["muted"],
                 justify="left",
                 wraplength=800
             )
@@ -2134,10 +2203,10 @@ class CaseFileApp(ctk.CTk):
         for suspect in suspects:
             card = ctk.CTkFrame(
                 self.main_frame,
-                fg_color="#162235",
+                fg_color=self.theme["card"],
                 corner_radius=12,
                 border_width=1,
-                border_color="#22354E"
+                border_color=self.theme["border"]
             )
 
             card.pack(
@@ -2150,7 +2219,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=suspect["name"],
                 font=("Arial", 20, "bold"),
-                text_color="#FFFFFF"
+                text_color=self.theme["heading"]
             )
 
             name_label.pack(
@@ -2163,7 +2232,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=f'{suspect["age"]} years old  •  {suspect["occupation"]}',
                 font=("Arial", 13),
-                text_color="#7D8DA6"
+                text_color=self.theme["muted"]
             )
 
             details_label.pack(
@@ -2176,7 +2245,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=suspect["status"],
                 font=("Arial", 12, "bold"),
-                text_color="#7FA9D8"
+                text_color=self.theme["accent"]
             )
 
             status_label.pack(
@@ -2193,7 +2262,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=f"INTERVIEW  •  {available_questions}/{total_questions} AVAILABLE  •  {asked_questions} ASKED",
                 font=("Arial", 11, "bold"),
-                text_color="#8B9BB4"
+                text_color=self.theme["muted"]
             )
 
             progress_label.pack(
@@ -2208,8 +2277,9 @@ class CaseFileApp(ctk.CTk):
                 font=("Arial", 12, "bold"),
                 width=140,
                 height=32,
-                fg_color="#1D4E89",
-                hover_color="#2863A8",
+                fg_color=self.theme["primary"],
+                hover_color=self.theme["primary_hover"],
+                text_color=self.theme["heading"],
                 command=lambda suspect_id=suspect["id"]: self.show_suspect_details(suspect_id)
             )
 
@@ -2234,8 +2304,8 @@ class CaseFileApp(ctk.CTk):
             height=35,
             fg_color="transparent",
             border_width=1,
-            border_color="#2A3D57",
-            hover_color="#1C2C44",
+            border_color=self.theme["border"],
+            hover_color=self.theme["card"],
             command=lambda: self.show_page("suspects")
         )
 
@@ -2281,7 +2351,7 @@ class CaseFileApp(ctk.CTk):
         # Information container
         info_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -2296,7 +2366,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text="MOTIVE",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         motive_title.pack(
@@ -2309,7 +2379,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=suspect["motive"],
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=800
         )
@@ -2325,7 +2395,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text="ALIBI",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         alibi_title.pack(
@@ -2338,7 +2408,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=suspect["alibi"],
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=800
         )
@@ -2354,7 +2424,7 @@ class CaseFileApp(ctk.CTk):
             self.main_frame,
             text="CONNECTED EVIDENCE",
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
 
         evidence_title.pack(
@@ -2367,7 +2437,7 @@ class CaseFileApp(ctk.CTk):
 
             evidence_card = ctk.CTkFrame(
                 self.main_frame,
-                fg_color="#162235",
+                fg_color=self.theme["card"],
                 corner_radius=12
             )
 
@@ -2381,7 +2451,7 @@ class CaseFileApp(ctk.CTk):
                 evidence_card,
                 text=evidence["title"],
                 font=("Arial", 16, "bold"),
-                text_color="#FFFFFF"
+                text_color=self.theme["heading"]
             )
 
             evidence_name.pack(
@@ -2394,7 +2464,7 @@ class CaseFileApp(ctk.CTk):
                 evidence_card,
                 text=evidence["connection_description"],
                 font=("Arial", 13),
-                text_color="#D5DCE8",
+                text_color=self.theme["text"],
                 justify="left",
                 wraplength=800
             )
@@ -2410,7 +2480,7 @@ class CaseFileApp(ctk.CTk):
             self.main_frame,
             text="INTERVIEW",
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
 
         interview_title.pack(
@@ -2423,7 +2493,7 @@ class CaseFileApp(ctk.CTk):
             self.main_frame,
             text="Question the suspect and investigate inconsistencies in their statements.",
             font=("Arial", 13),
-            text_color="#7D8DA6"
+            text_color=self.theme["muted"]
         )
 
         interview_subtitle.pack(
@@ -2434,7 +2504,7 @@ class CaseFileApp(ctk.CTk):
 
         progress_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -2448,7 +2518,7 @@ class CaseFileApp(ctk.CTk):
             progress_frame,
             text="INTERVIEW PROGRESS",
             font=("Arial", 12, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         progress_title.pack(
@@ -2465,7 +2535,7 @@ class CaseFileApp(ctk.CTk):
             progress_frame,
             text=f"{available_questions} / {total_questions} QUESTIONS AVAILABLE  •  {asked_questions} ASKED",
             font=("Arial", 13),
-            text_color="#D5DCE8"
+            text_color=self.theme["text"]
         )
 
         progress_text.pack(
@@ -2480,9 +2550,9 @@ class CaseFileApp(ctk.CTk):
             text="BEGIN INTERVIEW",
             width=200,
             height=45,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             font=("Arial", 14, "bold"),
             corner_radius=8,
             command=lambda: self.show_interview(suspect_id, suspect["name"])
@@ -2508,10 +2578,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=700,
             height=600,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -2525,7 +2595,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="INTERVIEW RECORD",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         header_label.pack(
             pady=(25, 8)
@@ -2535,7 +2605,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=suspect_name.upper(),
             font=("Arial", 24, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         suspect_label.pack(
             pady=(0, 20)
@@ -2544,7 +2614,7 @@ class CaseFileApp(ctk.CTk):
         # Divider
         divider = ctk.CTkFrame(
             modal,
-            fg_color="#2A3D57",
+            fg_color=self.theme["border"],
             height=1
         )
         divider.pack(
@@ -2556,7 +2626,7 @@ class CaseFileApp(ctk.CTk):
         # Question display frame
         question_frame = ctk.CTkFrame(
             modal,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
         question_frame.pack(
@@ -2570,7 +2640,7 @@ class CaseFileApp(ctk.CTk):
             question_frame,
             text="",
             font=("Arial", 12, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         counter_label.pack(
             anchor="w",
@@ -2583,7 +2653,7 @@ class CaseFileApp(ctk.CTk):
             question_frame,
             text="",
             font=("Arial", 16),
-            text_color="#FFFFFF",
+            text_color=self.theme["heading"],
             justify="center",
             wraplength=600
         )
@@ -2598,9 +2668,9 @@ class CaseFileApp(ctk.CTk):
             text="ASK QUESTION",
             width=160,
             height=38,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             font=("Arial", 13, "bold"),
             corner_radius=8
         )
@@ -2611,7 +2681,7 @@ class CaseFileApp(ctk.CTk):
         # Response section
         response_frame = ctk.CTkFrame(
             modal,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
         response_frame.pack(
@@ -2624,7 +2694,7 @@ class CaseFileApp(ctk.CTk):
             response_frame,
             text="RESPONSE",
             font=("Arial", 12, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         response_title.pack(
             anchor="w",
@@ -2636,7 +2706,7 @@ class CaseFileApp(ctk.CTk):
             response_frame,
             text="",
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=600,
             anchor="w"
@@ -2652,9 +2722,9 @@ class CaseFileApp(ctk.CTk):
             text="PRESENT EVIDENCE",
             width=160,
             height=32,
-            fg_color="#1D4E89",
-            hover_color="#2863A8",
-            text_color="#FFFFFF",
+            fg_color=self.theme["primary"],
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["heading"],
             font=("Arial", 12, "bold"),
             corner_radius=8
         )
@@ -2685,8 +2755,8 @@ class CaseFileApp(ctk.CTk):
             width=120,
             height=35,
             fg_color="transparent",
-            hover_color="#1C2C44",
-            text_color="#7D8DA6",
+            hover_color=self.theme["card"],
+            text_color=self.theme["muted"],
             corner_radius=8,
             command=lambda: navigate(-1)
         )
@@ -2700,8 +2770,8 @@ class CaseFileApp(ctk.CTk):
             width=120,
             height=35,
             fg_color="transparent",
-            hover_color="#1C2C44",
-            text_color="#7D8DA6",
+            hover_color=self.theme["card"],
+            text_color=self.theme["muted"],
             corner_radius=8,
             command=lambda: navigate(1)
         )
@@ -2722,9 +2792,9 @@ class CaseFileApp(ctk.CTk):
             height=38,
             fg_color="transparent",
             border_width=1,
-            border_color="#2A3D57",
-            hover_color="#1C2C44",
-            text_color="#7D8DA6",
+            border_color=self.theme["border"],
+            hover_color=self.theme["card"],
+            text_color=self.theme["muted"],
             corner_radius=8,
             command=close_modal
         )
@@ -2747,19 +2817,19 @@ class CaseFileApp(ctk.CTk):
 
                 if is_available:
                     # Show question
-                    question_label.configure(text=question, text_color="#FFFFFF")
-                    ask_button.configure(state="normal", fg_color="#1C2C44", text_color="#FFFFFF")
+                    question_label.configure(text=question, text_color=self.theme["heading"])
+                    ask_button.configure(state="normal", fg_color=self.theme["card"], text_color=self.theme["heading"])
 
                     # Check if already asked
                     if question_data["id"] in asked_questions:
-                        response_label.configure(text=answer, text_color="#D5DCE8")
+                        response_label.configure(text=answer, text_color=self.theme["text"])
                         if question_data.get("id") in self.contradictions:
                             present_evidence_button.pack(anchor="w", padx=20, pady=(10, 15))
                             present_evidence_button.configure(command=lambda q=question_data["id"]: self.show_evidence_selection(q, modal))
                         else:
                             present_evidence_button.pack_forget()
                     else:
-                        response_label.configure(text="", text_color="#4A5568")
+                        response_label.configure(text="", text_color=self.theme["muted"])
                         present_evidence_button.pack_forget()
 
                     # Set ask button command
@@ -2778,9 +2848,9 @@ class CaseFileApp(ctk.CTk):
                     )
                 else:
                     # Locked question
-                    question_label.configure(text="LOCKED — Further investigation required", text_color="#4A5568")
-                    ask_button.configure(state="disabled", fg_color="#0F1623", text_color="#4A5568")
-                    response_label.configure(text="", text_color="#4A5568")
+                    question_label.configure(text="LOCKED — Further investigation required", text_color=self.theme["muted"])
+                    ask_button.configure(state="disabled", fg_color=self.theme["background"], text_color=self.theme["muted"])
+                    response_label.configure(text="", text_color=self.theme["muted"])
                     present_evidence_button.pack_forget()
 
             # Update navigation buttons
@@ -2795,7 +2865,7 @@ class CaseFileApp(ctk.CTk):
             return
             
         if index == 0:
-            label.configure(text="", text_color="#D5DCE8")
+            label.configure(text="", text_color=self.theme["text"])
             if btn:
                 btn.pack_forget()
             
@@ -2849,10 +2919,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=500,
             height=500,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
         
@@ -2860,7 +2930,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="PRESENT EVIDENCE",
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         modal_title.pack(pady=(25, 15))
 
@@ -2868,13 +2938,13 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="Select evidence that challenges this statement:",
             font=("Arial", 13),
-            text_color="#7D8DA6"
+            text_color=self.theme["muted"]
         )
         instruction.pack(pady=(0, 15))
         
         selection_frame = ctk.CTkScrollableFrame(
             modal,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=10,
             width=400,
             height=250
@@ -2887,8 +2957,8 @@ class CaseFileApp(ctk.CTk):
                 text=f"{evidence['title']}  •  {evidence['evidence_type']}",
                 font=("Arial", 13),
                 fg_color="transparent",
-                hover_color="#1C2C44",
-                text_color="#D5DCE8",
+                hover_color=self.theme["card"],
+                text_color=self.theme["text"],
                 anchor="w",
                 height=35,
                 command=lambda e_id=evidence['id']: self.check_contradiction(question_id, e_id, modal, interview_modal)
@@ -2900,9 +2970,9 @@ class CaseFileApp(ctk.CTk):
             text="CANCEL",
             width=120,
             height=35,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         cancel_button.pack(pady=(0, 20))
@@ -2925,18 +2995,18 @@ class CaseFileApp(ctk.CTk):
             
         else:
             result_modal = ctk.CTkFrame(
-                self, width=450, height=200, fg_color="#101A2B",
-                corner_radius=15, border_width=1, border_color="#2A3D57"
+                self, width=450, height=200, fg_color=self.theme["card"],
+                corner_radius=15, border_width=1, border_color=self.theme["border"]
             )
             result_modal.place(relx=0.5, rely=0.5, anchor="center")
             
-            title = ctk.CTkLabel(result_modal, text="NO CONTRADICTION FOUND", font=("Arial", 16, "bold"), text_color="#7FA9D8")
+            title = ctk.CTkLabel(result_modal, text="NO CONTRADICTION FOUND", font=("Arial", 16, "bold"), text_color=self.theme["accent"])
             title.pack(pady=(30, 15))
             
-            desc = ctk.CTkLabel(result_modal, text="This evidence does not directly challenge the suspect's statement.", font=("Arial", 14), text_color="#7D8DA6")
+            desc = ctk.CTkLabel(result_modal, text="This evidence does not directly challenge the suspect's statement.", font=("Arial", 14), text_color=self.theme["muted"])
             desc.pack(pady=(0, 25))
             
-            close_btn = ctk.CTkButton(result_modal, text="CONTINUE INTERVIEW", width=180, height=35, fg_color="#1C2C44", hover_color="#2A3D57", text_color="#FFFFFF", command=result_modal.destroy)
+            close_btn = ctk.CTkButton(result_modal, text="CONTINUE INTERVIEW", width=180, height=35, fg_color=self.theme["card"], hover_color=self.theme["border"], text_color=self.theme["heading"], command=result_modal.destroy)
             close_btn.pack(pady=(0, 30))
             
     def create_evidence_page(self):
@@ -2962,10 +3032,10 @@ class CaseFileApp(ctk.CTk):
 
             card = ctk.CTkFrame(
                 self.main_frame,
-                fg_color="#162235",
+                fg_color=self.theme["card"],
                 corner_radius=12,
                 border_width=1,
-                border_color="#22354E",
+                border_color=self.theme["border"],
                 cursor="hand2"
             )
 
@@ -2979,7 +3049,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=evidence["title"],
                 font=("Arial", 18, "bold"),
-                text_color="#FFFFFF"
+                text_color=self.theme["heading"]
             )
 
             title_label.pack(
@@ -2992,7 +3062,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=f'{evidence["evidence_type"]}  •  {evidence["location"]}',
                 font=("Arial", 13),
-                text_color="#7D8DA6"
+                text_color=self.theme["muted"]
             )
 
             details_label.pack(
@@ -3005,7 +3075,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text=evidence["description"],
                 font=("Arial", 13),
-                text_color="#D5DCE8",
+                text_color=self.theme["text"],
                 justify="left",
                 wraplength=800
             )
@@ -3017,10 +3087,10 @@ class CaseFileApp(ctk.CTk):
             )
 
             importance_colors = {
-                "Low": "#6B7280",
-                "Medium": "#D4A72C",
-                "High": "#E67E22",
-                "Critical": "#E74C3C"
+                "Low": self.theme["importance_low"],
+                "Medium": self.theme["importance_medium"],
+                "High": self.theme["importance_high"],
+                "Critical": self.theme["importance_critical"]
             }
 
             importance_label = ctk.CTkLabel(
@@ -3029,7 +3099,7 @@ class CaseFileApp(ctk.CTk):
                 font=("Arial", 11, "bold"),
                 text_color=importance_colors.get(
                     evidence["importance"],
-                    "#7FA9D8"
+                    self.theme["accent"]
                 )
             )
 
@@ -3043,7 +3113,7 @@ class CaseFileApp(ctk.CTk):
                 card,
                 text="OPEN EVIDENCE  →",
                 font=("Arial", 11, "bold"),
-                text_color="#7FA9D8"
+                text_color=self.theme["accent"]
             )
 
             action_hint.pack(
@@ -3099,8 +3169,8 @@ class CaseFileApp(ctk.CTk):
             width=160,
             height=38,
             fg_color="transparent",
-            hover_color="#162235",
-            text_color="#7FA9D8",
+            hover_color=self.theme["card"],
+            text_color=self.theme["accent"],
             anchor="w",
             command=lambda: self.show_page("evidence")
         )
@@ -3127,7 +3197,7 @@ class CaseFileApp(ctk.CTk):
         # Information frame
         info_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
 
@@ -3141,7 +3211,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text="EVIDENCE DETAILS",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
 
         details_title.pack(
@@ -3155,7 +3225,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=f"Type: {evidence['evidence_type']}",
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             anchor="w"
         )
         type_label.pack(
@@ -3169,7 +3239,7 @@ class CaseFileApp(ctk.CTk):
             info_frame,
             text=f"Location: {evidence['location']}",
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             anchor="w"
         )
         location_label.pack(
@@ -3180,10 +3250,10 @@ class CaseFileApp(ctk.CTk):
 
         # Importance
         importance_colors = {
-            "Low": "#6B7280",
-            "Medium": "#D4A72C",
-            "High": "#E67E22",
-            "Critical": "#E74C3C"
+            "Low": self.theme["importance_low"],
+            "Medium": self.theme["importance_medium"],
+            "High": self.theme["importance_high"],
+            "Critical": self.theme["importance_critical"]
         }
         importance_label = ctk.CTkLabel(
             info_frame,
@@ -3191,7 +3261,7 @@ class CaseFileApp(ctk.CTk):
             font=("Arial", 14, "bold"),
             text_color=importance_colors.get(
                 evidence['importance'],
-                "#7FA9D8"
+                self.theme["accent"]
             ),
             anchor="w"
         )
@@ -3204,7 +3274,7 @@ class CaseFileApp(ctk.CTk):
         # Description frame
         desc_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=12
         )
         desc_frame.pack(
@@ -3218,7 +3288,7 @@ class CaseFileApp(ctk.CTk):
             desc_frame,
             text="DESCRIPTION",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8",
+            text_color=self.theme["accent"],
             anchor="w"
         )
         desc_title.pack(
@@ -3232,7 +3302,7 @@ class CaseFileApp(ctk.CTk):
             desc_frame,
             text=evidence['description'],
             font=("Arial", 14),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             justify="left",
             wraplength=800,
             anchor="w"
@@ -3249,9 +3319,9 @@ class CaseFileApp(ctk.CTk):
             text="CONNECT EVIDENCE",
             width=180,
             height=38,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=lambda: self.show_connection_modal(evidence_id)
         )
 
@@ -3279,10 +3349,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=500,
             height=400,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3296,7 +3366,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="CONNECT EVIDENCE",
             font=("Arial", 18, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         modal_title.pack(
             pady=(25, 15)
@@ -3307,7 +3377,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="Select another piece of evidence to connect with:",
             font=("Arial", 13),
-            text_color="#7D8DA6"
+            text_color=self.theme["muted"]
         )
         instruction.pack(
             pady=(0, 15)
@@ -3316,7 +3386,7 @@ class CaseFileApp(ctk.CTk):
         # Evidence selection frame
         selection_frame = ctk.CTkFrame(
             modal,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=10
         )
         selection_frame.pack(
@@ -3336,8 +3406,8 @@ class CaseFileApp(ctk.CTk):
                 text=evidence["title"],
                 font=("Arial", 13),
                 fg_color="transparent",
-                hover_color="#1C2C44",
-                text_color="#D5DCE8",
+                hover_color=self.theme["card"],
+                text_color=self.theme["text"],
                 anchor="w",
                 height=35,
                 command=lambda e=evidence, ce=current_evidence_id, cet=current_evidence_title, m=modal: self.show_analysis_modal(e["id"], e["title"], ce, cet, m)
@@ -3354,9 +3424,9 @@ class CaseFileApp(ctk.CTk):
             text="CANCEL",
             width=120,
             height=35,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         cancel_button.pack(
@@ -3371,10 +3441,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=600,
             height=580,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3388,7 +3458,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="ANALYZE CONNECTION",
             font=("Arial", 13, "bold"),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         header_label.pack(
             pady=(25, 8)
@@ -3399,7 +3469,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="How are these clues connected?",
             font=("Arial", 15),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         question_label.pack(
             pady=(0, 20)
@@ -3419,7 +3489,7 @@ class CaseFileApp(ctk.CTk):
         # First evidence card
         evidence1_card = ctk.CTkFrame(
             evidence_container,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=10
         )
         evidence1_card.pack(
@@ -3433,7 +3503,7 @@ class CaseFileApp(ctk.CTk):
             evidence1_card,
             text=current_evidence_title,
             font=("Arial", 13, "bold"),
-            text_color="#FFFFFF",
+            text_color=self.theme["heading"],
             wraplength=250,
             justify="center"
         )
@@ -3447,7 +3517,7 @@ class CaseFileApp(ctk.CTk):
             evidence_container,
             text="↔",
             font=("Arial", 20, "bold"),
-            text_color="#7FA9D8",
+            text_color=self.theme["accent"],
             width=30
         )
         connection_symbol.pack(
@@ -3458,7 +3528,7 @@ class CaseFileApp(ctk.CTk):
         # Second evidence card
         evidence2_card = ctk.CTkFrame(
             evidence_container,
-            fg_color="#162235",
+            fg_color=self.theme["card"],
             corner_radius=10
         )
         evidence2_card.pack(
@@ -3472,7 +3542,7 @@ class CaseFileApp(ctk.CTk):
             evidence2_card,
             text=selected_evidence_title,
             font=("Arial", 13, "bold"),
-            text_color="#FFFFFF",
+            text_color=self.theme["heading"],
             wraplength=250,
             justify="center"
         )
@@ -3486,7 +3556,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="CONNECTION TYPE",
             font=("Arial", 12, "bold"),
-            text_color="#7D8DA6"
+            text_color=self.theme["muted"]
         )
         connection_section_label.pack(
             pady=(0, 12)
@@ -3497,7 +3567,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="",
             font=("Arial", 12),
-            text_color="#7FA9D8"
+            text_color=self.theme["accent"]
         )
         selected_label.pack(
             pady=(0, 10)
@@ -3514,8 +3584,8 @@ class CaseFileApp(ctk.CTk):
                 text=conn_type,
                 font=("Arial", 13),
                 fg_color="transparent",
-                hover_color="#1C2C44",
-                text_color="#D5DCE8",
+                hover_color=self.theme["card"],
+                text_color=self.theme["text"],
                 width=220,
                 height=38,
                 corner_radius=8,
@@ -3532,9 +3602,9 @@ class CaseFileApp(ctk.CTk):
             text="ANALYZE CONNECTION",
             width=200,
             height=42,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             font=("Arial", 14, "bold"),
             corner_radius=8,
             command=lambda se=selected_evidence_id, ce=current_evidence_id, sc=selected_connection, m=modal: self.analyze_connection(se, ce, sc["value"], m)
@@ -3550,8 +3620,8 @@ class CaseFileApp(ctk.CTk):
             width=100,
             height=35,
             fg_color="transparent",
-            hover_color="#1C2C44",
-            text_color="#7D8DA6",
+            hover_color=self.theme["card"],
+            text_color=self.theme["muted"],
             corner_radius=8,
             command=modal.destroy
         )
@@ -3561,14 +3631,14 @@ class CaseFileApp(ctk.CTk):
 
     def select_connection_type(self, connection_type, selected_dict, selected_label, buttons):
         selected_dict["value"] = connection_type
-        selected_label.configure(text=f"Selected: {connection_type}", text_color="#7FA9D8")
+        selected_label.configure(text=f"Selected: {connection_type}", text_color=self.theme["accent"])
         
         # Reset all buttons to transparent
         for btn in buttons.values():
-            btn.configure(fg_color="transparent", text_color="#D5DCE8")
+            btn.configure(fg_color="transparent", text_color=self.theme["text"])
         
         # Highlight selected button with blue accent
-        buttons[connection_type].configure(fg_color="#16345C", text_color="#7FA9D8")
+        buttons[connection_type].configure(fg_color=self.theme["primary"], text_color=self.theme["accent"])
 
     def analyze_connection(self, selected_evidence_id, current_evidence_id, selected_connection_type, modal):
         if selected_connection_type is None:
@@ -3603,10 +3673,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=450,
             height=180,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3620,7 +3690,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="The evidence may be related, but this does not\nappear to be the strongest connection.",
             font=("Arial", 14),
-            text_color="#7D8DA6",
+            text_color=self.theme["muted"],
             justify="center"
         )
         message.pack(
@@ -3633,9 +3703,9 @@ class CaseFileApp(ctk.CTk):
             text="CLOSE",
             width=100,
             height=35,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         close_button.pack()
@@ -3645,10 +3715,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=450,
             height=250,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3662,7 +3732,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="CONNECTION DISCOVERED",
             font=("Arial", 20, "bold"),
-            text_color="#D4A72C"
+            text_color=self.theme["warning"]
         )
         title.pack(
             pady=(30, 15)
@@ -3673,7 +3743,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=connection_data["title"],
             font=("Arial", 16, "bold"),
-            text_color="#FFFFFF"
+            text_color=self.theme["heading"]
         )
         lead_title.pack(
             pady=(0, 10)
@@ -3684,7 +3754,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=connection_data["description"],
             font=("Arial", 13),
-            text_color="#D5DCE8",
+            text_color=self.theme["text"],
             wraplength=380,
             justify="center"
         )
@@ -3699,9 +3769,9 @@ class CaseFileApp(ctk.CTk):
             text="CONTINUE",
             width=130,
             height=38,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         continue_button.pack()
@@ -3711,10 +3781,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=400,
             height=180,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3728,7 +3798,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text="No meaningful connection can be established\nfrom these pieces of evidence.",
             font=("Arial", 14),
-            text_color="#7D8DA6",
+            text_color=self.theme["muted"],
             justify="center"
         )
         message.pack(
@@ -3741,9 +3811,9 @@ class CaseFileApp(ctk.CTk):
             text="CLOSE",
             width=100,
             height=35,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         close_button.pack()
@@ -3753,10 +3823,10 @@ class CaseFileApp(ctk.CTk):
             self,
             width=400,
             height=180,
-            fg_color="#101A2B",
+            fg_color=self.theme["card"],
             corner_radius=15,
             border_width=1,
-            border_color="#2A3D57"
+            border_color=self.theme["border"]
         )
 
         modal.place(
@@ -3770,7 +3840,7 @@ class CaseFileApp(ctk.CTk):
             modal,
             text=f"This connection has already been documented:\n{connection_title}",
             font=("Arial", 14),
-            text_color="#7D8DA6",
+            text_color=self.theme["muted"],
             justify="center"
         )
         message.pack(
@@ -3783,9 +3853,9 @@ class CaseFileApp(ctk.CTk):
             text="CLOSE",
             width=100,
             height=35,
-            fg_color="#1C2C44",
-            hover_color="#2A3D57",
-            text_color="#FFFFFF",
+            fg_color=self.theme["card"],
+            hover_color=self.theme["border"],
+            text_color=self.theme["heading"],
             command=modal.destroy
         )
         close_button.pack()
@@ -3799,44 +3869,88 @@ class CaseFileApp(ctk.CTk):
 
         # Check if there are discovered leads
         if not self.discovered_leads:
-            # Show empty state
+
+            # Empty state container
             empty_state_frame = ctk.CTkFrame(
                 self.main_frame,
-                fg_color="#162235",
-                corner_radius=12
+                fg_color=self.theme["card"],
+                corner_radius=14,
+                border_width=1,
+                border_color=self.theme["border"]
             )
 
             empty_state_frame.pack(
                 fill="x",
                 padx=40,
-                pady=(0, 15)
+                pady=(8, 20)
             )
 
-            # Empty state icon/text
+            # Investigation icon
+            empty_icon = ctk.CTkLabel(
+                empty_state_frame,
+                text="◌",
+                font=("Arial", 34),
+                text_color=self.theme["accent"]
+            )
+
+            empty_icon.pack(
+                pady=(32, 8)
+            )
+
+            # Status label
+            status_label = ctk.CTkLabel(
+                empty_state_frame,
+                text="INVESTIGATION IN PROGRESS",
+                font=("Arial", 11, "bold"),
+                text_color=self.theme["accent"]
+            )
+
+            status_label.pack(
+                pady=(0, 8)
+            )
+
+            # Main title
             empty_title = ctk.CTkLabel(
                 empty_state_frame,
                 text="No findings documented yet",
-                font=("Arial", 18, "bold"),
-                text_color="#7D8DA6"
+                font=("Arial", 20, "bold"),
+                text_color=self.theme["heading"]
             )
 
             empty_title.pack(
-                pady=(40, 10)
+                pady=(0, 10)
             )
 
+            # Description
             empty_description = ctk.CTkLabel(
                 empty_state_frame,
-                text="Analyze evidence, challenge suspect statements, and your discoveries will be recorded here.",
+                text=(
+                    "Your case findings will appear here as you connect evidence, "
+                    "expose contradictions, and uncover new leads."
+                ),
                 font=("Arial", 14),
-                text_color="#8B9BB4",
-                wraplength=800,
+                text_color=self.theme["muted"],
+                wraplength=720,
                 justify="center"
             )
 
             empty_description.pack(
-                padx=40,
-                pady=(0, 40)
+                padx=50,
+                pady=(0, 12)
             )
+
+            # Next step hint
+            next_step = ctk.CTkLabel(
+                empty_state_frame,
+                text="NEXT STEP  •  Review evidence and investigate possible connections",
+                font=("Arial", 11, "bold"),
+                text_color=self.theme["accent"]
+            )
+
+            next_step.pack(
+                pady=(0, 32)
+            )
+
         else:
             evidence_lookup = self.get_evidence_lookup()
 
@@ -3849,10 +3963,10 @@ class CaseFileApp(ctk.CTk):
 
                 finding_card = ctk.CTkFrame(
                     self.main_frame,
-                    fg_color="#162235",
+                    fg_color=self.theme["card"],
                     corner_radius=12,
                     border_width=1,
-                    border_color="#22354E"
+                    border_color=self.theme["border"]
                 )
 
                 finding_card.pack(
@@ -3865,7 +3979,7 @@ class CaseFileApp(ctk.CTk):
                     finding_card,
                     text=self.get_finding_label(finding_data["source_type"]),
                     font=("Arial", 12, "bold"),
-                    text_color="#7FA9D8"
+                    text_color=self.theme["accent"]
                 )
 
                 finding_header.pack(
@@ -3878,7 +3992,7 @@ class CaseFileApp(ctk.CTk):
                     finding_card,
                     text=finding_data["title"],
                     font=("Arial", 17, "bold"),
-                    text_color="#FFFFFF"
+                    text_color=self.theme["heading"]
                 )
 
                 finding_title.pack(
@@ -3891,7 +4005,7 @@ class CaseFileApp(ctk.CTk):
                     finding_card,
                     text=finding_data["description"],
                     font=("Arial", 14),
-                    text_color="#D5DCE8",
+                    text_color=self.theme["text"],
                     justify="left",
                     wraplength=800,
                     anchor="w"
@@ -3908,7 +4022,7 @@ class CaseFileApp(ctk.CTk):
                         finding_card,
                         text="RELATED EVIDENCE  •  " + "  +  ".join(related_evidence),
                         font=("Arial", 12, "bold"),
-                        text_color="#8B9BB4",
+                        text_color=self.theme["muted"],
                         justify="left",
                         wraplength=800
                     )
@@ -3920,45 +4034,94 @@ class CaseFileApp(ctk.CTk):
                     )
 
     def create_timeline_page(self):
+
         discovered, total = self.get_timeline_progress()
+
         self.create_page_header(
             "Timeline",
-            f"Reconstruct the night as discoveries land. {discovered} of {total} events documented.",
+            f"Reconstruct the night as discoveries land. "
+            f"{discovered} of {total} events documented.",
             "Timeline"
         )
 
         self.timeline_event_widgets = {}
+
         items = self.get_timeline_display_items()
+
         focus_id = self.pending_timeline_focus
         self.pending_timeline_focus = None
 
-        rail = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        rail.pack(fill="both", expand=True, padx=40, pady=(0, 30))
+        rail = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="transparent"
+        )
+
+        rail.pack(
+            fill="both",
+            expand=True,
+            padx=40,
+            pady=(0, 30)
+        )
 
         for index, event in enumerate(items):
+
             is_gap = event.get("kind") == "gap"
             is_focus = event["id"] == focus_id
 
-            timeline_row = ctk.CTkFrame(rail, fg_color="transparent")
-            timeline_row.pack(fill="x", pady=0)
+            timeline_row = ctk.CTkFrame(
+                rail,
+                fg_color="transparent"
+            )
 
-            marker_column = ctk.CTkFrame(timeline_row, width=28, fg_color="transparent")
-            marker_column.pack(side="left", fill="y", padx=(0, 14))
+            timeline_row.pack(
+                fill="x",
+                pady=0
+            )
+
+            # Timeline Marker Column
+
+            marker_column = ctk.CTkFrame(
+                timeline_row,
+                width=28,
+                fg_color="transparent"
+            )
+
+            marker_column.pack(
+                side="left",
+                fill="y",
+                padx=(0, 14)
+            )
+
             marker_column.pack_propagate(False)
 
             if index > 0:
+
                 top_line = ctk.CTkFrame(
                     marker_column,
                     width=2,
                     height=14,
-                    fg_color="#2A3D57",
+                    fg_color=self.theme["border"],
                     corner_radius=1
                 )
-                top_line.pack(pady=(0, 0))
 
-            dot_color = "#4A5568" if is_gap else "#7FA9D8"
+                top_line.pack(
+                    pady=(0, 0)
+                )
+
+            # Timeline dot
+
             if is_focus:
-                dot_color = "#D4A72C"
+
+                dot_color = self.theme["warning"]
+
+            elif is_gap:
+
+                dot_color = self.theme["muted"]
+
+            else:
+
+                dot_color = self.theme["accent"]
+
             dot = ctk.CTkLabel(
                 marker_column,
                 text="○" if is_gap else "●",
@@ -3966,90 +4129,188 @@ class CaseFileApp(ctk.CTk):
                 text_color=dot_color,
                 width=28
             )
+
             dot.pack()
 
             if index < len(items) - 1:
+
                 bottom_line = ctk.CTkFrame(
                     marker_column,
                     width=2,
-                    fg_color="#2A3D57",
+                    fg_color=self.theme["border"],
                     corner_radius=1
                 )
-                bottom_line.pack(fill="y", expand=True, pady=(2, 0))
 
-            border_color = "#D4A72C" if is_focus else ("#1A2738" if is_gap else "#22354E")
+                bottom_line.pack(
+                    fill="y",
+                    expand=True,
+                    pady=(2, 0)
+                )
+
+            # Event Card
+
+            if is_focus:
+
+                border_color = self.theme["warning"]
+
+            else:
+
+                border_color = self.theme["border"]
+
             event_frame = ctk.CTkFrame(
                 timeline_row,
-                fg_color="#121C2C" if is_gap else "#162235",
+                fg_color=self.theme["background"]
+                if is_gap
+                else self.theme["card"],
                 corner_radius=12,
                 border_width=1,
                 border_color=border_color
             )
-            event_frame.pack(side="left", fill="x", expand=True, pady=(0, 12))
-            self.timeline_event_widgets[event["id"]] = event_frame
+
+            event_frame.pack(
+                side="left",
+                fill="x",
+                expand=True,
+                pady=(0, 12)
+            )
+
+            self.timeline_event_widgets[
+                event["id"]
+            ] = event_frame
+
+            # Time
 
             time_label = ctk.CTkLabel(
                 event_frame,
                 text=event["time"],
                 font=("Arial", 16, "bold"),
-                text_color="#5B6B82" if is_gap else "#7FA9D8",
+                text_color=(
+                    self.theme["muted"]
+                    if is_gap
+                    else self.theme["accent"]
+                ),
                 width=150,
                 anchor="w"
             )
-            time_label.pack(side="left", padx=(20, 12), pady=20)
 
-            details_frame = ctk.CTkFrame(event_frame, fg_color="transparent")
-            details_frame.pack(side="left", fill="both", expand=True, pady=16, padx=(0, 20))
+            time_label.pack(
+                side="left",
+                padx=(20, 12),
+                pady=20
+            )
 
-            header_row = ctk.CTkFrame(details_frame, fg_color="transparent")
-            header_row.pack(fill="x")
+            # Event Details
+
+            details_frame = ctk.CTkFrame(
+                event_frame,
+                fg_color="transparent"
+            )
+
+            details_frame.pack(
+                side="left",
+                fill="both",
+                expand=True,
+                pady=16,
+                padx=(0, 20)
+            )
+
+            header_row = ctk.CTkFrame(
+                details_frame,
+                fg_color="transparent"
+            )
+
+            header_row.pack(
+                fill="x"
+            )
 
             event_label = ctk.CTkLabel(
                 header_row,
                 text=event["title"],
                 font=("Arial", 16, "bold"),
-                text_color="#8B9BB4" if is_gap else "#FFFFFF",
+                text_color=(
+                    self.theme["muted"]
+                    if is_gap
+                    else self.theme["heading"]
+                ),
                 justify="left",
                 wraplength=560,
                 anchor="w"
             )
-            event_label.pack(side="left", anchor="w")
+
+            event_label.pack(
+                side="left",
+                anchor="w"
+            )
+
+            # Event type badge
 
             if not is_gap:
+
                 type_label = ctk.CTkLabel(
                     header_row,
-                    text=event.get("event_type", "EVENT"),
+                    text=event.get(
+                        "event_type",
+                        "EVENT"
+                    ),
                     font=("Arial", 11, "bold"),
-                    text_color="#7FA9D8",
-                    fg_color="#1C2C44",
+                    text_color=self.theme["accent"],
+                    fg_color=self.theme["background"],
                     corner_radius=8,
                     padx=8,
                     pady=2
                 )
-                type_label.pack(side="right", padx=(12, 0))
+
+                type_label.pack(
+                    side="right",
+                    padx=(12, 0)
+                )
+
+            # Description
 
             description_label = ctk.CTkLabel(
                 details_frame,
                 text=event["description"],
                 font=("Arial", 13),
-                text_color="#7D8DA6" if is_gap else "#D5DCE8",
+                text_color=(
+                    self.theme["muted"]
+                    if is_gap
+                    else self.theme["text"]
+                ),
                 justify="left",
                 wraplength=650,
                 anchor="w"
             )
-            description_label.pack(anchor="w", pady=(6, 0))
+
+            description_label.pack(
+                anchor="w",
+                pady=(6, 0)
+            )
+
+            # Location
 
             if event.get("location") and not is_gap:
+
                 location_label = ctk.CTkLabel(
                     details_frame,
                     text=event["location"],
                     font=("Arial", 12),
-                    text_color="#7D8DA6"
+                    text_color=self.theme["muted"]
                 )
-                location_label.pack(anchor="w", pady=(6, 0))
+
+                location_label.pack(
+                    anchor="w",
+                    pady=(6, 0)
+                )
 
         if focus_id:
-            self.after(80, lambda: self.scroll_to_timeline_event(focus_id))
+
+            self.after(
+                80,
+                lambda:
+                    self.scroll_to_timeline_event(
+                        focus_id
+                    )
+            )
 
     def show_settings_page(self):
 
@@ -4275,7 +4536,7 @@ class CaseFileApp(ctk.CTk):
                     else self.theme["primary"]
                 ),
                 hover_color=colors["primary_hover"],
-                text_color="#FFFFFF",
+                text_color=self.theme["heading"],
                 state="disabled" if is_selected else "normal",
                 command=lambda name=theme_name: self.set_theme(name)
             )
@@ -4364,18 +4625,15 @@ class CaseFileApp(ctk.CTk):
         if theme_name not in THEMES:
             return
 
-        # Change active theme
         self.current_theme = theme_name
         self.theme = THEMES[theme_name]
 
-        # Save preference
         self.save_settings()
-
-        # Apply colors immediately
         self.apply_theme()
 
-        # Rebuild Settings page so ACTIVE indicator updates
-        self.show_page("settings")
+        # Refresh the current page with the new theme
+        current_page = self.current_page
+        self.show_page(current_page)
 
     def save_settings(self):
 
