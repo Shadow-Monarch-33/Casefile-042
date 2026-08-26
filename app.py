@@ -4324,6 +4324,59 @@ class CaseFileApp(ctk.CTk):
 
         return "Midnight Blue"
 
+    def apply_theme(self):
+
+        # Root window
+        self.configure(
+            fg_color=self.theme["background"]
+        )
+
+        # Sidebar
+        if hasattr(self, "sidebar"):
+            self.sidebar.configure(
+                fg_color=self.theme["sidebar"]
+            )
+
+        # Main content area
+        if hasattr(self, "main_frame"):
+            self.main_frame.configure(
+                fg_color=self.theme["background"]
+            )
+
+        # Sidebar navigation buttons
+        if hasattr(self, "nav_buttons"):
+            for button in self.nav_buttons.values():
+                button.configure(
+                    text_color=self.theme["text"],
+                    hover_color=self.theme["primary_hover"]
+                )
+
+        # Navigation badges
+        if hasattr(self, "nav_badges"):
+            for badge in self.nav_badges.values():
+                badge.configure(
+                    fg_color=self.theme["card"],
+                    text_color=self.theme["accent"]
+                )
+
+    def set_theme(self, theme_name):
+
+        if theme_name not in THEMES:
+            return
+
+        # Change active theme
+        self.current_theme = theme_name
+        self.theme = THEMES[theme_name]
+
+        # Save preference
+        self.save_settings()
+
+        # Apply colors immediately
+        self.apply_theme()
+
+        # Rebuild Settings page so ACTIVE indicator updates
+        self.show_page("settings")
+
     def save_settings(self):
 
         settings_path = os.path.expanduser(
