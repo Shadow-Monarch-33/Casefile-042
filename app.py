@@ -663,7 +663,7 @@ class CaseFileApp(ctk.CTk):
         elif page_name == "case resolution":
             self.show_case_resolution_page()
 
-    def show_case_briefing(self):
+    def show_case_briefing(self, revisit=False):
 
         # Dark overlay
         overlay = ctk.CTkFrame(
@@ -925,7 +925,7 @@ class CaseFileApp(ctk.CTk):
             if current_page == len(briefing_pages) - 1:
 
                 next_button.configure(
-                    text="BEGIN INVESTIGATION  →",
+                    text="RETURN TO CASE  →" if revisit else "BEGIN INVESTIGATION  →",
                     command=overlay.destroy
                 )
 
@@ -1021,6 +1021,33 @@ class CaseFileApp(ctk.CTk):
             self.nav_button_rows[page_name] = row
             self.nav_buttons[page_name] = button
             self.nav_badges[page_name] = badge
+
+        # Push utility buttons to the bottom
+        bottom_spacer = ctk.CTkFrame(
+            self.sidebar,
+            fg_color="transparent"
+        )
+        bottom_spacer.pack(fill="both", expand=True)
+
+
+        briefing_button = ctk.CTkButton(
+            self.sidebar,
+            text="📁  CASE BRIEFING",
+            font=("Arial", 13, "bold"),
+            anchor="w",
+            height=42,
+            corner_radius=8,
+            fg_color="transparent",
+            hover_color=self.theme["primary_hover"],
+            text_color=self.theme["text"],
+            command=self.show_case_briefing
+        )
+
+        briefing_button.pack(
+            fill="x",
+            padx=15,
+            pady=(0, 15)
+        )
 
     def update_nav_state(self):
 
