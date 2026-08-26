@@ -127,6 +127,95 @@ class CaseFileApp(ctk.CTk):
                 ),
                 "evidence_ids": {7, 8},
                 "connection_type": "Person"
+            },
+            frozenset({1, 8}): {
+                "id": "elena_sophie_same_floor",
+                "title": "TWO PEOPLE ON THE EXECUTIVE FLOOR",
+                "description": (
+                    "Elena's access activity and Sophie's trace inside the victim's office "
+                    "suggest that more than one person may have been connected to the "
+                    "executive floor that night."
+                ),
+                "evidence_ids": {1, 8},
+                "connection_type": "Person"
+            },
+
+            frozenset({2, 7}): {
+                "id": "financial_access_to_security",
+                "title": "FINANCIAL PRESSURE AND SYSTEM ACCESS",
+                "description": (
+                    "The deleted financial records establish a possible motive, while the "
+                    "security administrator activity raises the possibility that someone "
+                    "may have tried to control what could be seen or recorded."
+                ),
+                "evidence_ids": {2, 7},
+                "connection_type": "Motive / System"
+            },
+            frozenset({3, 4}): {
+                "id": "selective_camera_failure",
+                "title": "SELECTIVE CAMERA BLACKOUT",
+                "description": (
+                    "The server room camera continued recording while the executive floor "
+                    "cameras went offline, suggesting the blackout was selective rather "
+                    "than a building-wide system failure."
+                ),
+                "evidence_ids": {3, 4},
+                "connection_type": "System"
+            },
+            frozenset({3, 7}): {
+                "id": "security_systems_intact",
+                "title": "SECURITY SYSTEMS WERE STILL ACTIVE",
+                "description": (
+                    "The continued server room recording alongside the security administrator "
+                    "login suggests the wider surveillance system remained functional while "
+                    "only the executive floor lost visibility."
+                ),
+                "evidence_ids": {3, 7},
+                "connection_type": "System"
+            },
+            frozenset({5, 8}): {
+                "id": "sophie_near_critical_window",
+                "title": "SOPHIE CONNECTED TO THE CRITICAL PERIOD",
+                "description": (
+                    "The victim's watch places the estimated struggle at 10:24 PM, while "
+                    "Sophie's trace establishes that she had been inside the victim's office "
+                    "that night, making her movements during the critical period important."
+                ),
+                "evidence_ids": {5, 8},
+                "connection_type": "Timeline"
+            },
+            frozenset({6, 7}): {
+                "id": "marcus_opportunity_blackout",
+                "title": "UNACCOUNTED FOR DURING SECURITY ACTIVITY",
+                "description": (
+                    "Marcus's meeting ended before the critical struggle window, while "
+                    "security administrator activity occurred shortly afterwards, leaving "
+                    "important movements during the blackout unexplained."
+                ),
+                "evidence_ids": {6, 7},
+                "connection_type": "Timeline"
+            },
+            frozenset({2, 8}): {
+                "id": "motive_and_scene_presence",
+                "title": "MOTIVE AND SCENE CONNECTION",
+                "description": (
+                    "The financial records point toward a possible motive, while the "
+                    "physical trace in the victim's office shows that the investigation "
+                    "must distinguish between motive and actual presence."
+                ),
+                "evidence_ids": {2, 8},
+                "connection_type": "Motive / Person"
+            },
+            frozenset({1, 6}): {
+                "id": "multiple_unverified_accounts",
+                "title": "MULTIPLE ACCOUNTS UNDER QUESTION",
+                "description": (
+                    "Elena's recorded access and Marcus's shortened meeting both conflict "
+                    "with their initial accounts, revealing that more than one suspect may "
+                    "be concealing part of their movements."
+                ),
+                "evidence_ids": {1, 6},
+                "connection_type": "Person"
             }
         }
 
@@ -628,7 +717,7 @@ class CaseFileApp(ctk.CTk):
             },
             {
                 "heading": "YOUR OBJECTIVE",
-                "heading_color": "#D4A72C",
+                "heading_color": "#0BFB0B",
                 "text": (
                     "Examine the evidence.\n\n"
 
