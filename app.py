@@ -1,9 +1,69 @@
+import json
+import os
 import customtkinter as ctk
 from database import get_connection
 from functools import partial
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
+
+THEMES = {
+    "Midnight Blue": {
+        "background": "#0A101B",
+        "sidebar": "#101A2B",
+        "card": "#162235",
+        "border": "#2A3D57",
+        "primary": "#1C4F82",
+        "primary_hover": "#2868A5",
+        "accent": "#7FA9D8",
+        "heading": "#FFFFFF",
+        "text": "#D5DCE8",
+        "muted": "#7D8DA6",
+        "warning": "#D4A72C"
+    },
+
+    "Crimson Noir": {
+        "background": "#120B0E",
+        "sidebar": "#1A1014",
+        "card": "#24151A",
+        "border": "#4A2832",
+        "primary": "#7A2638",
+        "primary_hover": "#9B3248",
+        "accent": "#E89AA8",
+        "heading": "#FFFFFF",
+        "text": "#E4D7DA",
+        "muted": "#A68B91",
+        "warning": "#D4A72C"
+    },
+
+    "Emerald Investigation": {
+        "background": "#081310",
+        "sidebar": "#0E1C18",
+        "card": "#142722",
+        "border": "#29483F",
+        "primary": "#1F6B55",
+        "primary_hover": "#2B866C",
+        "accent": "#8FD8BE",
+        "heading": "#FFFFFF",
+        "text": "#D2E5DD",
+        "muted": "#819C91",
+        "warning": "#D4A72C"
+    },
+
+    "Monochrome": {
+        "background": "#111111",
+        "sidebar": "#181818",
+        "card": "#222222",
+        "border": "#3A3A3A",
+        "primary": "#555555",
+        "primary_hover": "#707070",
+        "accent": "#C9C9C9",
+        "heading": "#FFFFFF",
+        "text": "#DDDDDD",
+        "muted": "#999999",
+        "warning": "#D4A72C"
+    }
+}
 
 class CaseFileApp(ctk.CTk):
     def __init__(self):
@@ -20,12 +80,20 @@ class CaseFileApp(ctk.CTk):
         self.nav_badges = {}
         self.pending_timeline_focus = None
         self.timeline_event_widgets = {}
+
+        self.current_theme = self.load_settings()
+
+        self.theme = THEMES[
+            self.current_theme
+        ]
+
         self.page_config = {
             "case overview": {"label": "Case Overview", "icon": "▣"},
             "suspects": {"label": "Suspects", "icon": "◉"},
             "evidence": {"label": "Evidence", "icon": "⌕"},
             "timeline": {"label": "Timeline", "icon": "◷"},
-            "deduction board": {"label": "Case Findings", "icon": "✦"}
+            "deduction board": {"label": "Case Findings", "icon": "✦"},
+            "settings": {"label": "Settings", "icon": "⚙"}
         }
         self.valid_connections = {
             frozenset({1, 4}): {
@@ -527,6 +595,9 @@ class CaseFileApp(ctk.CTk):
         elif page_name == "deduction board":
             self.create_deduction_board_page()
 
+        elif page_name == "settings":
+            self.show_settings_page()
+
     def show_case_briefing(self):
 
         # Dark overlay
@@ -839,7 +910,8 @@ class CaseFileApp(ctk.CTk):
             "suspects",
             "evidence",
             "timeline",
-            "deduction board"
+            "deduction board",
+            "settings"
         ]
 
         for index, page_name in enumerate(nav_items):
@@ -3978,6 +4050,300 @@ class CaseFileApp(ctk.CTk):
 
         if focus_id:
             self.after(80, lambda: self.scroll_to_timeline_event(focus_id))
+
+    def show_settings_page(self):
+
+        # Reset scroll position
+        self.main_frame._parent_canvas.yview_moveto(0)
+
+        # Page Header
+
+        header = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="transparent"
+        )
+
+        header.pack(
+            fill="x",
+            padx=40,
+            pady=(40, 10)
+        )
+
+        title = ctk.CTkLabel(
+            header,
+            text="SETTINGS",
+            font=("Arial", 32, "bold"),
+            text_color=self.theme["heading"]
+        )
+
+        title.pack(
+            anchor="w"
+        )
+
+        subtitle = ctk.CTkLabel(
+            header,
+            text="Customize your CASEFILE investigation workspace.",
+            font=("Arial", 14),
+            text_color=self.theme["muted"]
+        )
+
+        subtitle.pack(
+            anchor="w",
+            pady=(5, 0)
+        )
+
+        # Appearance Card
+
+        appearance_card = ctk.CTkFrame(
+            self.main_frame,
+            fg_color=self.theme["card"],
+            corner_radius=14,
+            border_width=1,
+            border_color=self.theme["border"]
+        )
+
+        appearance_card.pack(
+            fill="x",
+            padx=40,
+            pady=(25, 20)
+        )
+
+        appearance_title = ctk.CTkLabel(
+            appearance_card,
+            text="APPEARANCE",
+            font=("Arial", 14, "bold"),
+            text_color=self.theme["accent"]
+        )
+
+        appearance_title.pack(
+            anchor="w",
+            padx=25,
+            pady=(25, 5)
+        )
+
+        appearance_subtitle = ctk.CTkLabel(
+            appearance_card,
+            text="Choose the visual style of your investigation interface.",
+            font=("Arial", 13),
+            text_color=self.theme["muted"]
+        )
+
+        appearance_subtitle.pack(
+            anchor="w",
+            padx=25,
+            pady=(0, 20)
+        )
+
+        descriptions = {
+            "Midnight Blue":
+                "The original CASEFILE investigation interface.",
+
+            "Crimson Noir":
+                "A darker, tense atmosphere with deep crimson accents.",
+
+            "Emerald Investigation":
+                "A calm investigative environment with emerald tones.",
+
+            "Monochrome":
+                "A minimal grayscale interface with a noir aesthetic."
+        }
+
+        # Theme Cards
+
+        for theme_name, colors in THEMES.items():
+
+            is_selected = (
+                theme_name == self.current_theme
+            )
+
+            card_color = (
+                self.theme["background"]
+            )
+
+            theme_card = ctk.CTkFrame(
+                appearance_card,
+                fg_color=card_color,
+                corner_radius=10,
+                border_width=2 if is_selected else 1,
+                border_color=(
+                    colors["primary"]
+                    if is_selected
+                    else self.theme["border"]
+                )
+            )
+
+            theme_card.pack(
+                fill="x",
+                padx=25,
+                pady=7
+            )
+
+            # Left side information
+            info_frame = ctk.CTkFrame(
+                theme_card,
+                fg_color="transparent"
+            )
+
+            info_frame.pack(
+                side="left",
+                fill="both",
+                expand=True,
+                padx=(18, 10),
+                pady=15
+            )
+
+            theme_title = ctk.CTkLabel(
+                info_frame,
+                text=theme_name,
+                font=("Arial", 15, "bold"),
+                text_color=self.theme["heading"]
+            )
+
+            theme_title.pack(
+                anchor="w"
+            )
+
+            description = ctk.CTkLabel(
+                info_frame,
+                text=descriptions[theme_name],
+                font=("Arial", 12),
+                text_color=self.theme["muted"]
+            )
+
+            description.pack(
+                anchor="w",
+                pady=(4, 0)
+            )
+
+            # Color preview
+            preview_frame = ctk.CTkFrame(
+                theme_card,
+                fg_color="transparent"
+            )
+
+            preview_frame.pack(
+                side="right",
+                padx=(10, 18)
+            )
+
+            for color_key in [
+                "background",
+                "sidebar",
+                "card",
+                "primary",
+                "accent"
+            ]:
+
+                preview = ctk.CTkFrame(
+                    preview_frame,
+                    width=18,
+                    height=18,
+                    corner_radius=9,
+                    fg_color=colors[color_key]
+                )
+
+                preview.pack(
+                    side="left",
+                    padx=3
+                )
+
+            # Active indicator
+            if is_selected:
+
+                active_label = ctk.CTkLabel(
+                    theme_card,
+                    text="✓ ACTIVE",
+                    font=("Arial", 11, "bold"),
+                    text_color=colors["accent"]
+                )
+
+                active_label.pack(
+                    side="right",
+                    padx=(0, 15)
+                )
+
+            # Select theme
+            select_button = ctk.CTkButton(
+                theme_card,
+                text="SELECTED" if is_selected else "SELECT",
+                width=100,
+                height=34,
+                font=("Arial", 11, "bold"),
+                fg_color=(
+                    colors["primary"]
+                    if is_selected
+                    else self.theme["primary"]
+                ),
+                hover_color=colors["primary_hover"],
+                text_color="#FFFFFF",
+                state="disabled" if is_selected else "normal",
+                command=lambda name=theme_name: self.set_theme(name)
+            )
+
+            select_button.pack(
+                side="right",
+                padx=(0, 10)
+            )
+
+        # Bottom spacing
+        ctk.CTkFrame(
+            self.main_frame,
+            height=30,
+            fg_color="transparent"
+        ).pack()
+
+    def load_settings(self):
+
+        settings_path = os.path.expanduser(
+            "~/.casefile_settings.json"
+        )
+
+        try:
+
+            if os.path.exists(settings_path):
+
+                with open(settings_path, "r") as file:
+
+                    settings = json.load(file)
+
+                    saved_theme = settings.get(
+                        "theme",
+                        "Midnight Blue"
+                    )
+
+                    if saved_theme in THEMES:
+
+                        return saved_theme
+
+        except (
+            json.JSONDecodeError,
+            OSError
+        ):
+
+            pass
+
+        return "Midnight Blue"
+
+    def save_settings(self):
+
+        settings_path = os.path.expanduser(
+            "~/.casefile_settings.json"
+        )
+
+        try:
+
+            with open(settings_path, "w") as file:
+
+                json.dump(
+                    {
+                        "theme": self.current_theme
+                    },
+                    file
+                )
+
+        except OSError:
+
+            pass
 
 if __name__ == "__main__":
     app = CaseFileApp()
