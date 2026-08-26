@@ -357,6 +357,8 @@ class CaseFileApp(ctk.CTk):
 
         self.show_page("case overview")
 
+        self.after(150, self.show_case_briefing)
+
     def create_layout(self):
         # Sidebar
         self.sidebar = ctk.CTkFrame(
@@ -435,6 +437,227 @@ class CaseFileApp(ctk.CTk):
 
         elif page_name == "deduction board":
             self.create_deduction_board_page()
+
+    def show_case_briefing(self):
+
+        # Dark overlay
+        overlay = ctk.CTkFrame(
+            self,
+            fg_color="#0A101B",
+            corner_radius=0
+        )
+
+        overlay.place(
+            relx=0,
+            rely=0,
+            relwidth=1,
+            relheight=1
+        )
+
+        # Main briefing container
+        briefing = ctk.CTkFrame(
+            overlay,
+            width=760,
+            height=600,
+            fg_color="#101A2B",
+            corner_radius=18,
+            border_width=1,
+            border_color="#2A3D57"
+        )
+
+        briefing.place(
+            relx=0.5,
+            rely=0.5,
+            anchor="center"
+        )
+
+        briefing.pack_propagate(False)
+
+        # CASEFILE label
+        casefile_label = ctk.CTkLabel(
+            briefing,
+            text="CASEFILE",
+            font=("Arial", 13, "bold"),
+            text_color="#7FA9D8"
+        )
+
+        casefile_label.pack(
+            pady=(35, 4)
+        )
+
+        # Case number
+        case_number = ctk.CTkLabel(
+            briefing,
+            text="CASE #042",
+            font=("Arial", 28, "bold"),
+            text_color="#FFFFFF"
+        )
+
+        case_number.pack()
+
+        # Divider
+        divider = ctk.CTkFrame(
+            briefing,
+            height=1,
+            fg_color="#2A3D57"
+        )
+
+        divider.pack(
+            fill="x",
+            padx=50,
+            pady=(20, 20)
+        )
+
+        # Section
+        briefing_label = ctk.CTkLabel(
+            briefing,
+            text="INITIAL BRIEFING",
+            font=("Arial", 12, "bold"),
+            text_color="#D4A72C"
+        )
+
+        briefing_label.pack()
+
+        # Main briefing text
+        briefing_text = ctk.CTkLabel(
+            briefing,
+            text="",
+            font=("Arial", 14),
+            text_color="#D5DCE8",
+            justify="center",
+            wraplength=620
+        )
+
+        briefing_text.pack(
+            padx=60,
+            pady=(12, 20)
+        )
+
+        # What we know
+        known_title = ctk.CTkLabel(
+            briefing,
+            text="",
+            font=("Arial", 12, "bold"),
+            text_color="#9CCBFF"
+        )
+
+        known_title.pack(
+            pady=(5, 8)
+        )
+
+        known_text = ctk.CTkLabel(
+            briefing,
+            text="",
+            font=("Arial", 13),
+            text_color="#B9C5D6",
+            justify="left",
+            wraplength=600
+        )
+
+        known_text.pack(
+            padx=60
+        )
+
+        # Button
+        begin_button = ctk.CTkButton(
+            briefing,
+            text="BEGIN INVESTIGATION  →",
+            width=240,
+            height=44,
+            font=("Arial", 14, "bold"),
+            fg_color="#1C4F82",
+            hover_color="#2868A5",
+            text_color="#FFFFFF",
+            command=overlay.destroy
+        )
+
+        full_briefing = (
+            "A critical incident occurred within the company's "
+            "executive and security infrastructure.\n\n"
+            "Several records from the night contain inconsistencies, "
+            "and the available evidence does not yet provide a complete "
+            "account of what happened.\n\n"
+            "Four individuals connected to the incident are currently "
+            "under investigation."
+        )
+
+        full_known = (
+            "• Activity occurred during a critical security window.\n"
+            "• Multiple records and systems contain relevant information.\n"
+            "• Several individuals may have had access or knowledge.\n"
+            "• The available accounts do not yet form a complete timeline."
+        )
+
+
+        def type_known_title(index=0):
+
+            title = "WHAT WE KNOW"
+
+            if index < len(title):
+
+                known_title.configure(
+                    text=title[:index + 1]
+                )
+
+                briefing.after(
+                    35,
+                    lambda: type_known_title(index + 1)
+                )
+
+            else:
+
+                briefing.after(
+                    150,
+                    type_known
+                )
+
+
+        def type_known(index=0):
+
+            if index < len(full_known):
+
+                known_text.configure(
+                    text=full_known[:index + 1]
+                )
+
+                briefing.after(
+                    25,
+                    lambda: type_known(index + 1)
+                )
+
+            else:
+
+                briefing.after(
+                    300,
+                    lambda: begin_button.pack(
+                        pady=(25, 30)
+                    )
+                )
+
+
+        def type_briefing(index=0):
+
+            if index < len(full_briefing):
+
+                briefing_text.configure(
+                    text=full_briefing[:index + 1]
+                )
+
+                briefing.after(
+                    25,
+                    lambda: type_briefing(index + 1)
+                )
+
+            else:
+
+                # Briefing finished
+                briefing.after(
+                    400,
+                    type_known_title
+                )
+
+
+        type_briefing()
 
     def build_sidebar_navigation(self):
         nav_items = [
