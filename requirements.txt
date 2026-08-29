@@ -1,4 +1,4 @@
 streamlit # -> app / UI
 mysql-connector-python # -> Connect Python and MySQL
-pandas # -> Useful for displaying database results cleanly (not yet used in project though)
+# pandas -> Useful for displaying database results cleanly (not yet used in project though) [not yet used]
 python-dotenv # -> reads the hidden .env database credentials
