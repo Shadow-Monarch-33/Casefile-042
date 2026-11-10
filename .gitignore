@@ -1,16 +1,18 @@
-# Virtual environment
+# Virtual environments
 venv/
 .venv/
 
 # Environment variables and secrets
 .env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
 *.py[cod]
-
-# Streamlit secrets
-.streamlit/secrets.toml
+*.egg-info/
+.pytest_cache/
+.coverage
 
 # OS files
 .DS_Store
@@ -19,3 +21,10 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Build artifacts
+build/
+dist/
+
+# Logs
+*.log
