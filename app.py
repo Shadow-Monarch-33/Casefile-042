@@ -2076,7 +2076,7 @@ class CaseFileApp(ctk.CTk):
 
     def get_evidence_lookup(self):
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT id, title FROM evidence")
         evidence_lookup = {evidence["id"]: evidence["title"] for evidence in cursor.fetchall()}
         cursor.close()
@@ -2592,7 +2592,7 @@ class CaseFileApp(ctk.CTk):
         )
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute("SELECT * FROM suspects")
 
@@ -2717,10 +2717,10 @@ class CaseFileApp(ctk.CTk):
         )
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute(
-            "SELECT * FROM suspects WHERE id = %s",
+            "SELECT * FROM suspects WHERE id = ?",
             (suspect_id,)
         )
 
@@ -2735,7 +2735,7 @@ class CaseFileApp(ctk.CTk):
             FROM evidence_connections
             JOIN evidence
                 ON evidence_connections.evidence_id = evidence.id
-            WHERE evidence_connections.suspect_id = %s
+            WHERE evidence_connections.suspect_id = ?
         """, (suspect_id,))
 
         connected_evidence = cursor.fetchall()
@@ -3310,7 +3310,7 @@ class CaseFileApp(ctk.CTk):
 
     def show_evidence_selection(self, question_id, interview_modal):
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM evidence")
         all_evidence = cursor.fetchall()
         cursor.close()
@@ -3418,7 +3418,7 @@ class CaseFileApp(ctk.CTk):
         )
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute("SELECT * FROM evidence")
 
@@ -3554,10 +3554,10 @@ class CaseFileApp(ctk.CTk):
         self.main_frame._parent_canvas.yview_moveto(0)
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute(
-            "SELECT * FROM evidence WHERE id = %s",
+            "SELECT * FROM evidence WHERE id = ?",
             (evidence_id,)
         )
 
@@ -3735,7 +3735,7 @@ class CaseFileApp(ctk.CTk):
     def show_connection_modal(self, current_evidence_id):
         # Get all evidence items
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
         cursor.execute("SELECT * FROM evidence")
         all_evidence = cursor.fetchall()
         cursor.close()
@@ -5296,7 +5296,7 @@ class CaseFileApp(ctk.CTk):
         # GET SUSPECTS
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute("""
             SELECT *
@@ -5684,7 +5684,7 @@ class CaseFileApp(ctk.CTk):
         # Load all evidence
 
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor()
 
         cursor.execute("""
             SELECT *
@@ -6544,8 +6544,8 @@ class CaseFileApp(ctk.CTk):
         
         # Get suspect name
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM suspects WHERE id = %s", (correct_solution["suspect_id"],))
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM suspects WHERE id = ?", (correct_solution["suspect_id"],))
         suspect = cursor.fetchone()
         cursor.close()
         connection.close()

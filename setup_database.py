@@ -6,50 +6,45 @@ def setup_database():
     cursor = None
 
     try:
-        connection = get_connection(use_database=False)
+        connection = get_connection()
         cursor = connection.cursor()
-
-        cursor.execute("CREATE DATABASE IF NOT EXISTS casefile")
-        cursor.execute("USE casefile")
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS suspects (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(100) NOT NULL,
-                age INT,
-                occupation VARCHAR(100),
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                age INTEGER,
+                occupation TEXT,
                 motive TEXT,
                 alibi TEXT,
-                status VARCHAR(50) DEFAULT 'Under Investigation'
+                status TEXT DEFAULT 'Under Investigation'
             )
         """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS evidence (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(150) NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
                 description TEXT NOT NULL,
-                evidence_type VARCHAR(50),
-                location VARCHAR(100),
-                importance ENUM(
-                    'Low', 'Medium', 'High', 'Critical'
-                ) DEFAULT 'Medium'
+                evidence_type TEXT,
+                location TEXT,
+                importance TEXT NOT NULL DEFAULT 'Medium' CHECK (importance IN ('Low', 'Medium', 'High', 'Critical'))
             )
         """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS timeline (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                event_time TIME NOT NULL,
-                event VARCHAR(255) NOT NULL,
-                location VARCHAR(100) NOT NULL
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_time TEXT NOT NULL,
+                event TEXT NOT NULL,
+                location TEXT NOT NULL
             )
         """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS evidence_connections (
-                evidence_id INT NOT NULL,
-                suspect_id INT NOT NULL,
+                evidence_id INTEGER NOT NULL,
+                suspect_id INTEGER NOT NULL,
                 connection_description TEXT,
 
                 PRIMARY KEY (evidence_id, suspect_id),
@@ -78,19 +73,19 @@ def setup_database():
                     "Existing case data detected. "
                     "Skipping seed operation."
                 )
-                print("Database 'casefile' is ready.")
+                print("SQLite database 'casefile.db' is ready.")
                 return
 
+        # The seed uses fixed suspect/evidence IDs for relationship records.
+        # Avoid silently reusing different IDs if tables were previously emptied.
         for table in ("suspects", "evidence"):
-            cursor.execute(f"SHOW TABLE STATUS LIKE '{table}'")
-            status = cursor.fetchone()
-            if status is not None:
-                next_id = status[10]
-                if next_id is not None and next_id != 1:
-                    raise RuntimeError(
-                        f"Table '{table}' has an existing ID sequence. "
-                        "Use a fresh database for the initial case seed."
-                    )
+            cursor.execute("SELECT seq FROM sqlite_sequence WHERE name = ?", (table,))
+            prior_sequence = cursor.fetchone()
+            if prior_sequence is not None and prior_sequence[0] > 0:
+                raise RuntimeError(
+                    f"Table '{table}' previously contained records. "
+                    "Use a fresh database for the initial case seed."
+                )
 
         suspects = [
             (
@@ -295,30 +290,30 @@ def setup_database():
         cursor.executemany("""
             INSERT INTO suspects
             (name, age, occupation, motive, alibi, status)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, suspects)
 
         cursor.executemany("""
             INSERT INTO evidence
             (title, description, evidence_type, location, importance)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (?, ?, ?, ?, ?)
         """, evidence)
 
         cursor.executemany("""
             INSERT INTO timeline
             (event_time, event, location)
-            VALUES (%s, %s, %s)
+            VALUES (?, ?, ?)
         """, timeline)
 
         cursor.executemany("""
             INSERT INTO evidence_connections
             (evidence_id, suspect_id, connection_description)
-            VALUES (%s, %s, %s)
+            VALUES (?, ?, ?)
         """, evidence_connections)
 
         connection.commit()
 
-        print("Database 'casefile' initialized successfully!")
+        print("SQLite database 'casefile.db' initialized successfully!")
         print(f"Suspects: {len(suspects)}")
         print(f"Evidence items: {len(evidence)}")
         print(f"Timeline events: {len(timeline)}")
@@ -334,7 +329,7 @@ def setup_database():
     finally:
         if cursor is not None:
             cursor.close()
-        if connection is not None and connection.is_connected():
+        if connection is not None:
             connection.close()
 
 

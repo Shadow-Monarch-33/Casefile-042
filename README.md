@@ -2,7 +2,7 @@
 
 ### Every suspect has a story. Every piece of evidence tells another.
 
-**CASEFILE #42** is an interactive desktop detective game built using **Python, CustomTkinter, and MySQL**, where players investigate a fictional murder by examining evidence, interrogating suspects, identifying contradictions, and reconstructing the events surrounding the crime.
+**CASEFILE #42** is an interactive desktop detective game built using **Python, CustomTkinter, and SQLite**, where players investigate a fictional murder by examining evidence, interrogating suspects, identifying contradictions, and reconstructing the events surrounding the crime.
 
 Rather than relying on random guesses, players must build a case through observation, deduction, and logical reasoning.
 
@@ -151,9 +151,7 @@ Progression is discovery-driven. Players can investigate different leads and gra
 |---|---|
 | Python | Core application and game logic |
 | CustomTkinter | Desktop graphical interface |
-| MySQL | Storage of suspects, evidence, timelines, and relationships |
-| mysql-connector-python | Python–MySQL communication |
-| python-dotenv | Local database credential configuration |
+| SQLite (Python standard library) | Local storage of suspects, evidence, timelines, and relationships |
 
 ---
 
@@ -164,7 +162,6 @@ Progression is discovery-driven. Players can investigate different leads and gra
 Before running CASEFILE, make sure you have:
 
 - Python 3.10 or newer
-- MySQL Server installed and running
 - A desktop environment supporting Tkinter
 - Git (optional, for cloning)
 
@@ -203,23 +200,13 @@ The required packages are:
 
 ```text
 customtkinter
-mysql-connector-python
-python-dotenv
 ```
 
-### 4. Configure MySQL
+### 4. Database Configuration
 
-Start your MySQL server and create a MySQL user with permission to create and access the `casefile` database.
-
-Copy `.env.example` to `.env` and enter your database credentials:
-
-```env
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-```
-
-Keep `.env` private. It should never be committed to the repository.
+No configuration is needed. CASEFILE uses Python's built-in SQLite library.
+The file `casefile.db` is created in the project directory when you initialize the database.
+It is excluded from Git so your local game data stays on your computer.
 
 ### 5. Initialize the Database
 
@@ -230,6 +217,7 @@ python setup_database.py
 This creates the required tables and populates the initial case data.
 
 The setup script is designed to avoid overwriting existing case records when run again.
+An existing MySQL database is **not** migrated automatically; only the original case seed is created.
 
 ### 6. Launch CASEFILE
 
@@ -251,7 +239,7 @@ CASEFILE/
 ├── database.py
 ├── setup_database.py
 ├── requirements.txt
-├── .env.example
+├── casefile.db         # Created locally when initialized (ignored by Git)
 ├── .gitignore
 ├── README.md
 └── screenshots/       # Optional screenshots
@@ -259,13 +247,11 @@ CASEFILE/
 
 **app.py** — Main application, interface, and investigation mechanics.
 
-**database.py** — MySQL connection configuration.
+**database.py** — Local SQLite connection configuration.
 
 **setup_database.py** — Database schema creation and initial case data.
 
 **requirements.txt** — Python dependencies.
-
-**.env.example** — Example environment configuration.
 
 ---
 
@@ -274,7 +260,6 @@ CASEFILE/
 CASEFILE is currently a single-case desktop game.
 
 - The investigation contains one playable murder mystery.
-- A running local MySQL server is required.
 - Investigation progress is stored in memory during the application session and is not currently saved between launches.
 - The application has not been packaged as a standalone executable.
 
